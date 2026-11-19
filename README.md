@@ -1,7 +1,6 @@
 # Non Sông Việt — Bản đồ lịch sử Việt Nam
 
-Bản đồ tương tác lãnh thổ, triều đại, kinh đô và sự kiện Việt Nam từ **700 TCN → nay**,
-lấy cảm hứng từ [江山时序 / Jiangshan Map](https://deanchen.me/jiangshan-map/).
+Bản đồ tương tác lãnh thổ, triều đại, kinh đô và sự kiện Việt Nam từ **700 TCN → nay**.
 
 ## Tính năng
 
