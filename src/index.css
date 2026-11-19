@@ -1,0 +1,528 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-ink: #2f271d;
+  --color-paper: #f6f0e1;
+  --font-sans: 'Be Vietnam Pro', system-ui, sans-serif;
+  --font-serif: 'Noto Serif', Georgia, serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: #c7d6d4;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+.glass {
+  background: rgb(250 246 236 / 0.86);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgb(47 39 29 / 0.12);
+  box-shadow: 0 1px 2px rgb(47 39 29 / 0.08), 0 8px 28px -10px rgb(47 39 29 / 0.28);
+}
+
+/* Logo: mặt trời trống đồng Đông Sơn */
+.logo {
+  display: block;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: url('/favicon.svg') center / cover;
+}
+
+.panel {
+  position: absolute;
+  z-index: 20;
+  border-radius: 14px;
+  max-height: calc(100% - 68px - 175px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+@media (max-width: 767px) {
+  .panel {
+    max-height: 38vh;
+  }
+  .panel.right-3 {
+    top: auto;
+    bottom: 140px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    z-index: 25;
+  }
+}
+
+.btn-mini {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgb(47 39 29 / 0.15);
+  font-size: 15px;
+  line-height: 1;
+  color: rgb(47 39 29 / 0.75);
+}
+.btn-mini:hover:not(:disabled) {
+  background: rgb(47 39 29 / 0.07);
+}
+.btn-mini:disabled {
+  opacity: 0.3;
+}
+
+.chip {
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: rgb(47 39 29 / 0.06);
+  font-size: 12px;
+}
+.legend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 9px 2px 6px;
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.55);
+  border: 1px solid rgb(47 39 29 / 0.1);
+  font-size: 12px;
+}
+.legend-chip i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.ev-row {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+.ev-row:hover {
+  background: rgb(47 39 29 / 0.05);
+}
+.ev-row.active {
+  background: rgb(156 58 38 / 0.1);
+}
+.ev-row.future {
+  opacity: 0.55;
+}
+.ev-year {
+  width: 54px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: rgb(47 39 29 / 0.55);
+  font-size: 12px;
+  padding-top: 1px;
+}
+.ev-dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  color: white;
+  font-size: 10px;
+}
+
+.trace-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 5px 6px;
+  border-radius: 9px;
+}
+.trace-row:hover {
+  background: rgb(47 39 29 / 0.05);
+}
+.trace-row.active {
+  background: rgb(156 58 38 / 0.1);
+}
+.trace-bar {
+  width: 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.hint {
+  position: absolute;
+  right: 56px;
+  top: 68px;
+  z-index: 10;
+  max-width: 250px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: rgb(47 39 29 / 0.75);
+}
+
+/* ——— Timeline ——— */
+.timeline {
+  border-radius: 16px;
+}
+.btn-round,
+.btn-play {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 99px;
+}
+.btn-round {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgb(47 39 29 / 0.18);
+  font-size: 18px;
+  line-height: 1;
+}
+.btn-round:hover {
+  background: rgb(47 39 29 / 0.06);
+}
+.btn-play {
+  width: 38px;
+  height: 38px;
+  background: #9c3a26;
+  color: #fbf3e1;
+  font-size: 13px;
+  box-shadow: 0 4px 12px -4px #9c3a26;
+}
+.btn-play:hover {
+  background: #86301f;
+}
+.speed {
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid rgb(47 39 29 / 0.18);
+  background: transparent;
+  padding: 0 4px;
+  font-size: 12.5px;
+}
+.year-display,
+.year-input {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.year-display:hover {
+  color: #9c3a26;
+}
+.year-input {
+  width: 100%;
+  max-width: 220px;
+  background: white;
+  border-radius: 8px;
+  padding: 0 8px;
+  outline: 2px solid #9c3a26;
+}
+.tick {
+  position: absolute;
+  top: 60px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: rgb(47 39 29 / 0.5);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .tick:nth-of-type(even) {
+    display: none;
+  }
+  .year-display {
+    font-size: 21px;
+  }
+}
+.cursor {
+  position: absolute;
+  top: -2px;
+  bottom: 10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.cursor-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: #2f271d;
+}
+.cursor-knob {
+  position: absolute;
+  left: 50%;
+  top: 39px;
+  width: 14px;
+  height: 22px;
+  margin-left: -7px;
+  border-radius: 5px;
+  background: #fbf6ea;
+  border: 2px solid #2f271d;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+}
+.hover-tip {
+  position: absolute;
+  top: -20px;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: #2f271d;
+  color: #fbf6ea;
+  font-size: 11px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ——— Search ——— */
+.search {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  outline: none;
+}
+.search:focus {
+  border-color: #9c3a26;
+}
+.search-hit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 12px;
+  text-align: left;
+  font-size: 13.5px;
+}
+.search-hit.sel {
+  background: rgb(156 58 38 / 0.09);
+}
+.kind {
+  flex-shrink: 0;
+  width: 62px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgb(47 39 29 / 0.5);
+}
+.kind-period {
+  color: #9c3a26;
+}
+.kind-event {
+  color: #6d4c9f;
+}
+.kind-place,
+.kind-province {
+  color: #2e7d6b;
+}
+
+/* ——— Nhãn trên bản đồ ——— */
+.mk {
+  pointer-events: none;
+}
+.mk:has(button) {
+  pointer-events: auto;
+}
+.polity-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-serif);
+  color: color-mix(in srgb, var(--c) 45%, #1d150c);
+  text-shadow: 0 0 3px #f6f0e1, 0 0 6px #f6f0e1, 0 0 10px #f6f0e1;
+}
+.pl-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.polity-label.big .pl-name {
+  font-size: 17px;
+  letter-spacing: 0.12em;
+}
+.pl-dyn {
+  font-size: 11px;
+  font-style: italic;
+  opacity: 0.85;
+}
+.polity-label.culture .pl-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+.polity-label.neighbor-anchor .pl-name {
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  opacity: 0.75;
+}
+.static-label {
+  white-space: nowrap;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: #47707a;
+}
+.static-label.sea {
+  font-size: 18px;
+  letter-spacing: 0.35em;
+  opacity: 0.7;
+}
+.static-label.sea-sm {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+}
+.static-label.island {
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 600;
+  color: #2f5a63;
+}
+.static-label.island::before {
+  content: '∴ ';
+}
+.static-label.river {
+  font-size: 11px;
+  color: #3e7489;
+  text-shadow: 0 0 3px #f6f0e1;
+}
+.static-label.mountain {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #6b5537;
+  text-shadow: 0 0 3px #f6f0e1;
+}
+.capital {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transform: translateX(calc(50% - 6px));
+  white-space: nowrap;
+}
+.cap-dot {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  background: #fbf6ea;
+  border: 3px solid color-mix(in srgb, var(--c) 70%, #1d150c);
+  box-shadow: 0 0 0 1.5px #fbf6ea;
+}
+.capital.seat .cap-dot {
+  border-radius: 2px;
+  transform: rotate(45deg) scale(0.85);
+}
+.cap-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d150c;
+  text-shadow: 0 0 2px #fbf6ea, 0 0 5px #fbf6ea, 0 0 8px #fbf6ea;
+}
+.event-pin {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transform: translateX(calc(50% - 11px));
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.4s;
+}
+.ev-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  background: var(--c);
+  color: white;
+  font-size: 11px;
+  border: 2px solid #fbf6ea;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+  transition: transform 0.2s;
+}
+.event-pin.fresh .ev-icon {
+  animation: pulse 1.6s ease-out infinite;
+}
+.event-pin.fading {
+  opacity: 0.55;
+}
+.event-pin:hover,
+.event-pin.active {
+  opacity: 1;
+}
+.event-pin.active .ev-icon {
+  transform: scale(1.25);
+}
+.ev-title {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgb(251 246 234 / 0.92);
+  border: 1px solid rgb(47 39 29 / 0.12);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #2f271d;
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 60%, transparent), 0 2px 6px rgb(0 0 0 / 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 14px transparent, 0 2px 6px rgb(0 0 0 / 0.3);
+  }
+}
+.trace-pin {
+  width: 22px;
+  height: 30px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 30'%3E%3Cpath d='M11 29C11 29 1 17.5 1 11a10 10 0 0 1 20 0c0 6.5-10 18-10 18z' fill='%239c3a26' stroke='%23fbf6ea' stroke-width='2'/%3E%3Ccircle cx='11' cy='11' r='3.5' fill='%23fbf6ea'/%3E%3C/svg%3E") no-repeat center / contain;
+  filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.3));
+}
+
+.maplibregl-ctrl-top-right {
+  top: 62px;
+}
+.maplibregl-ctrl-bottom-right {
+  bottom: 150px;
+}
+.maplibregl-ctrl-group {
+  background: rgb(250 246 236 / 0.9) !important;
+  border-radius: 10px !important;
+}
+.maplibregl-ctrl-scale {
+  background: rgb(250 246 236 / 0.75) !important;
+  border-color: #2f271d !important;
+  color: #2f271d;
+}
+@media (max-width: 1023px) {
+  .maplibregl-ctrl-top-right {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .event-pin.fresh .ev-icon {
+    animation: none;
+  }
+}

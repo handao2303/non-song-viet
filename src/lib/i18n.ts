@@ -1,0 +1,45 @@
+import type { Lang, T } from '../data/types'
+
+const S = {
+  appName: { vi: 'Non Sông Việt', en: 'Vietnam Through Time' },
+  tagline: { vi: 'Bản đồ lịch sử lãnh thổ Việt Nam · 700 TCN → nay', en: 'A historical atlas of Vietnam · 700 BCE → today' },
+  layers: { vi: 'Lớp bản đồ', en: 'Layers' },
+  territories: { vi: 'Lãnh thổ lịch sử', en: 'Historical territories' },
+  capitals: { vi: 'Kinh đô · trị sở', en: 'Capitals & seats' },
+  events: { vi: 'Sự kiện lớn', en: 'Major events' },
+  rivers: { vi: 'Sông ngòi', en: 'Rivers' },
+  relief: { vi: 'Địa hình', en: 'Relief' },
+  modern: { vi: 'Ranh giới tỉnh (63 tỉnh)', en: 'Province lines (63)' },
+  search: { vi: 'Tìm triều đại, sự kiện, địa danh…', en: 'Search dynasties, events, places…' },
+  capital: { vi: 'Kinh đô', en: 'Capital' },
+  founder: { vi: 'Người sáng lập', en: 'Founder' },
+  stateName: { vi: 'Quốc hiệu', en: 'State name' },
+  rulers: { vi: 'Các đời vua', en: 'Rulers' },
+  eventsIn: { vi: 'Sử ký · sự kiện', en: 'Chronicle' },
+  onMap: { vi: 'Thế lực trên bản đồ', en: 'Powers on the map' },
+  area: { vi: 'Lãnh thổ người Việt cai quản', en: 'Area under Vietnamese rule' },
+  areaNote: { vi: 'ước tính theo ranh giới tỉnh hiện nay', en: 'estimated from modern province lines' },
+  trace: { vi: 'Điểm này qua các thời kỳ', en: 'This place through time' },
+  traceHint: { vi: 'Bấm vào bất kỳ đâu trên bản đồ để xem vùng đất ấy thuộc về ai qua từng thời kỳ.', en: 'Click anywhere on the map to see who ruled that place through history.' },
+  unclaimed: { vi: 'Chưa hình thành nhà nước', en: 'No organised state' },
+  play: { vi: 'Phát', en: 'Play' },
+  pause: { vi: 'Dừng', en: 'Pause' },
+  keys: { vi: '← → 1 năm · Shift 10 năm · PgUp/PgDn mốc thay đổi · Space phát', en: '← → 1 yr · Shift 10 yrs · PgUp/PgDn next change · Space play' },
+  disclaimer: { vi: 'Ranh giới là sơ đồ ước lượng dựa trên đơn vị tỉnh hiện đại, không phải bản đồ khảo sát.', en: 'Borders are schematic approximations built from modern provinces, not surveyed maps.' },
+  sources: { vi: 'Nguồn', en: 'Sources' },
+  now: { vi: 'Đang diễn ra', en: 'Happening' },
+  close: { vi: 'Đóng', en: 'Close' },
+  jump: { vi: 'Đến năm', en: 'Go to' },
+  nanTien: { vi: 'Hành trình Nam tiến', en: 'The March South' },
+  years: { vi: 'năm', en: 'yrs' },
+  noResult: { vi: 'Không tìm thấy', en: 'No results' },
+  period: { vi: 'Thời kỳ', en: 'Period' },
+  event: { vi: 'Sự kiện', en: 'Event' },
+  place: { vi: 'Địa danh', en: 'Place' },
+  province: { vi: 'Tỉnh', en: 'Province' },
+  gainedBy: { vi: 'Nhập vào Việt', en: 'Joined Vietnam' },
+} satisfies Record<string, T>
+
+export type Key = keyof typeof S
+export const tr = (lang: Lang, k: Key) => S[k][lang]
+export const pick = (lang: Lang, v: T | undefined) => (v ? v[lang] : '')
