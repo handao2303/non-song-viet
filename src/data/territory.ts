@@ -100,22 +100,25 @@ function foreign(r: Region, y: number): string | null {
 /** Chính thể Việt (hoặc đô hộ) đang cai quản vùng r ở năm y — giả định vùng đã thuộc Việt */
 function vietState(r: Region, y: number): string {
   const north = NORTH.includes(r)
+  // Mốc theo cách chia kỷ của Đại Việt sử ký toàn thư
   if (y < -257) return 'vanlang'
-  if (y < -179) return 'aulac'
-  if (y < -111) return 'nanyue'
+  if (y < -207) return 'aulac' // An Dương Vương: Giáp Thìn → Quý Tỵ (257–208 TCN)
+  if (y < -111) return 'nanyue' // Triệu kỷ: Giáp Ngọ → Canh Ngọ (207–111 TCN)
   if (y < 40) return 'chinese'
   if (y < 43) return 'trung'
-  if (y < 544) return 'chinese'
-  if (y < 603) return 'vanxuan'
-  if (y < 905) return 'chinese'
-  if (y < 939) return 'tuchu'
+  if (y < 541) return 'chinese'
+  if (y < 603) return 'vanxuan' // Tiền Nam Đế, Triệu Việt Vương, Hậu Nam Đế: Tân Dậu → Nhâm Tuất (541–602)
+  if (y < 907) return 'chinese'
+  if (y < 939) return 'tuchu' // Khúc Hạo giữ châu trị năm 907
   if (y < 966) return 'ngo'
   if (y < 968) return 'suquan'
-  if (y < 980) return 'dinh'
-  if (y < 1009) return 'tienle'
-  if (y < 1225) return 'ly'
+  if (y < 981) return 'dinh' // Đinh kỷ: Mậu Thìn → Canh Thìn (968–980)
+  if (y < 1010) return 'tienle' // Lê kỷ: Tân Tỵ → Kỷ Dậu (981–1009)
+  if (y < 1226) return 'ly' // Lý kỷ: Canh Tuất → Ất Dậu (1010–1225)
   if (y < 1400) return 'tran'
   if (y < 1407) return 'ho'
+  // Hậu Trần (Giản Định, Trùng Quang) giữ vùng Thanh – Nghệ – Thuận Hoá đến 1413
+  if (y < 1414 && (r === 'thanhnghe' || r === 'qbinh' || r === 'qtri' || r === 'hue')) return 'hautran'
   if (y < 1428) return 'minh'
   if (y < 1527) return 'leso'
   if (y < 1543) return 'mac'
@@ -187,7 +190,7 @@ export function neighborPolity(id: string, y: number): string | null {
 
 /** Các mốc năm có thay đổi lãnh thổ (dùng để nhảy nhanh & tính lịch sử điểm) */
 export const CHANGE_YEARS = [
-  -700, -257, -179, -111, 40, 43, 50, 192, 544, 550, 603, 758, 802, 860, 905, 939, 966, 968, 980, 1009, 1054, 1069, 1225, 1306, 1400,
-  1402, 1407, 1428, 1432, 1471, 1527, 1543, 1593, 1600, 1611, 1653, 1677, 1693, 1698, 1708, 1732, 1756, 1757, 1773, 1775, 1777,
+  -700, -257, -207, -111, 40, 43, 50, 192, 541, 550, 603, 758, 802, 860, 907, 939, 966, 968, 981, 1010, 1054, 1069, 1226, 1306, 1400,
+  1402, 1407, 1414, 1428, 1432, 1471, 1527, 1543, 1593, 1600, 1611, 1653, 1677, 1693, 1698, 1708, 1732, 1756, 1757, 1773, 1775, 1777,
   1786, 1788, 1793, 1799, 1801, 1802, 1804, 1836, 1839, 1862, 1867, 1884, 1898, 1945, 1954, 1955, 1975, 1976,
 ]

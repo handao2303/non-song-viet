@@ -40,7 +40,7 @@ export function chineseAdmin(y: number): T {
 export const POLITIES: Record<string, Polity> = {
   vanlang: { id: 'vanlang', kind: 'viet', color: '#c98a3d', dynasty: t('Hùng Vương', 'Hùng Kings'), name: fixed('Văn Lang', 'Văn Lang') },
   aulac: { id: 'aulac', kind: 'viet', color: '#c2723b', dynasty: t('An Dương Vương', 'An Dương Vương'), name: fixed('Âu Lạc', 'Âu Lạc') },
-  nanyue: { id: 'nanyue', kind: 'chinese', color: '#8f7aa0', dynasty: t('nhà Triệu', 'Triệu dynasty'), name: fixed('Nam Việt', 'Nanyue') },
+  nanyue: { id: 'nanyue', kind: 'viet', color: '#8f7aa0', dynasty: t('nhà Triệu (Toàn thư: Triệu kỷ)', 'Triệu dynasty (per the Toàn thư)'), name: fixed('Nam Việt', 'Nam Việt') },
   chinese: { id: 'chinese', kind: 'chinese', color: '#8e8476', dynasty: t('Bắc thuộc', 'Chinese rule'), name: (y) => chineseAdmin(y) },
   trung: { id: 'trung', kind: 'viet', color: '#d1495b', dynasty: t('Trưng Vương', 'Trưng Sisters'), name: fixed('Lĩnh Nam', 'Lĩnh Nam') },
   vanxuan: { id: 'vanxuan', kind: 'viet', color: '#c8683b', dynasty: t('nhà Tiền Lý', 'Early Lý'), name: fixed('Vạn Xuân', 'Vạn Xuân') },
@@ -51,6 +51,7 @@ export const POLITIES: Record<string, Polity> = {
   tienle: { id: 'tienle', kind: 'viet', color: '#b8573a', dynasty: t('nhà Tiền Lê', 'Early Lê'), name: fixed('Đại Cồ Việt', 'Đại Cồ Việt') },
   ly: { id: 'ly', kind: 'viet', color: '#c9553d', dynasty: t('nhà Lý', 'Lý dynasty'), name: (y) => (y < 1054 ? t('Đại Cồ Việt', 'Đại Cồ Việt') : t('Đại Việt', 'Đại Việt')) },
   tran: { id: 'tran', kind: 'viet', color: '#a8403f', dynasty: t('nhà Trần', 'Trần dynasty'), name: fixed('Đại Việt', 'Đại Việt') },
+  hautran: { id: 'hautran', kind: 'viet', color: '#9a4a52', dynasty: t('nhà Hậu Trần', 'Later Trần'), name: fixed('Hậu Trần', 'Later Trần') },
   ho: { id: 'ho', kind: 'viet', color: '#7d6b9c', dynasty: t('nhà Hồ', 'Hồ dynasty'), name: fixed('Đại Ngu', 'Đại Ngu') },
   minh: { id: 'minh', kind: 'chinese', color: '#8a7f73', dynasty: t('Minh thuộc', 'Ming occupation'), name: fixed('Quận Giao Chỉ', 'Jiaozhi Province') },
   leso: { id: 'leso', kind: 'viet', color: '#c08a1e', dynasty: t('nhà Hậu Lê (Lê sơ)', 'Later Lê'), name: fixed('Đại Việt', 'Đại Việt') },

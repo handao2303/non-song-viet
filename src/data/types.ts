@@ -25,6 +25,8 @@ export interface Period {
   capital?: T
   summary: T
   rulers?: string[]
+  /** Ghi chú theo Đại Việt sử ký toàn thư */
+  tt?: { vol: string; note: T }
 }
 
 export type EventCategory = 'battle' | 'politics' | 'territory' | 'culture' | 'disaster'
