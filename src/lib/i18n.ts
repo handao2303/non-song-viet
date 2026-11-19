@@ -25,7 +25,7 @@ const S = {
   play: { vi: 'Phát', en: 'Play' },
   pause: { vi: 'Dừng', en: 'Pause' },
   keys: { vi: '← → 1 năm · Shift 10 năm · PgUp/PgDn mốc thay đổi · Space phát', en: '← → 1 yr · Shift 10 yrs · PgUp/PgDn next change · Space play' },
-  disclaimer: { vi: 'Ranh giới là sơ đồ ước lượng dựa trên đơn vị tỉnh hiện đại, không phải bản đồ khảo sát.', en: 'Borders are schematic approximations built from modern provinces, not surveyed maps.' },
+  disclaimer: { vi: 'Niên đại đến 1789 theo Đại Việt sử ký toàn thư. Ranh giới là sơ đồ ước lượng dựa trên tỉnh hiện đại.', en: 'Dates to 1789 follow the Đại Việt sử ký toàn thư. Borders are schematic, built from modern provinces.' },
   sources: { vi: 'Nguồn', en: 'Sources' },
   now: { vi: 'Đang diễn ra', en: 'Happening' },
   close: { vi: 'Đóng', en: 'Close' },
@@ -38,6 +38,9 @@ const S = {
   place: { vi: 'Địa danh', en: 'Place' },
   province: { vi: 'Tỉnh', en: 'Province' },
   gainedBy: { vi: 'Nhập vào Việt', en: 'Joined Vietnam' },
+  toanthu: { vi: 'Toàn thư', en: 'Toàn thư' },
+  notInTT: { vi: 'Không chép trong Toàn thư', en: 'Not recorded in the Toàn thư' },
+  afterTT: { vi: 'Sau thời Toàn thư (1789) — chưa đối chiếu', en: 'After the Toàn thư (1789) — not cross-checked' },
 } satisfies Record<string, T>
 
 export type Key = keyof typeof S

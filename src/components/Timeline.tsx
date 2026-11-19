@@ -3,7 +3,7 @@ import { PERIODS } from '../data/periods'
 import { POLITIES } from '../data/polities'
 import { EVENTS, CAT_META } from '../data/events'
 import type { Lang } from '../data/types'
-import { fmtYear, fracToYear, normYear, yearToFrac } from '../lib/time'
+import { canChi, fmtYear, fracToYear, normYear, yearToFrac } from '../lib/time'
 import { pick, tr } from '../lib/i18n'
 
 interface Props {
@@ -184,6 +184,7 @@ function YearInput({ year, lang, onYear }: { year: number; lang: Lang; onYear: (
       title={tr(lang, 'jump')}
     >
       {fmtYear(year, lang)}
+      <span className="canchi">{canChi(year)}</span>
     </button>
   )
 }

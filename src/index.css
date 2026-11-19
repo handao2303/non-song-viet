@@ -526,3 +526,73 @@ body {
     animation: none;
   }
 }
+
+/* ——— Trích dẫn Toàn thư ——— */
+.tt-dot {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 4px;
+  background: rgb(156 58 38 / 0.1);
+  color: #9c3a26;
+  font-family: 'Noto Serif TC', 'Songti TC', serif;
+  font-size: 11px;
+}
+.tt-cite,
+.tt-note {
+  display: block;
+  margin: 2px 8px 6px 70px;
+  padding: 7px 10px;
+  border-left: 3px solid #9c3a26;
+  border-radius: 0 8px 8px 0;
+  background: rgb(156 58 38 / 0.06);
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgb(47 39 29 / 0.8);
+}
+.tt-note {
+  margin: 10px 0 0;
+}
+a.tt-cite:hover,
+a.tt-note:hover {
+  background: rgb(156 58 38 / 0.11);
+}
+.tt-cite.absent {
+  border-left-color: rgb(47 39 29 / 0.25);
+  background: rgb(47 39 29 / 0.04);
+}
+.tt-badge {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #86301f;
+}
+.absent .tt-badge {
+  color: rgb(47 39 29 / 0.55);
+}
+.tt-quote {
+  display: block;
+  font-family: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: #2f271d;
+}
+.tt-sub {
+  display: block;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.canchi {
+  margin-left: 10px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgb(47 39 29 / 0.5);
+}

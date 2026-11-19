@@ -6,7 +6,8 @@ import { ANNEX_INFO, provinceRegion } from '../data/territory'
 import type { HistEvent, Lang } from '../data/types'
 import type { PolityShape } from '../lib/geo'
 import type { TraceResult } from '../lib/trace'
-import { fmtSpan, fmtYear } from '../lib/time'
+import { canChi, fmtSpan, fmtYear } from '../lib/time'
+import { TT, TT_ABSENT, TT_END, volName, volUrl } from '../data/toanthu'
 import { pick, tr } from '../lib/i18n'
 
 /* ───────────── Thời kỳ hiện tại ───────────── */
@@ -76,6 +77,12 @@ export function PeriodPanel({
               )}
             </dl>
             <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink/85">{pick(lang, p.summary)}</p>
+            {p.tt && (
+              <a className="tt-note" href={volUrl(p.tt.vol)} target="_blank" rel="noreferrer">
+                <span className="tt-badge">📜 {tr(lang, 'toanthu')} · {volName(p.tt.vol, lang)}</span>
+                {pick(lang, p.tt.note)}
+              </a>
+            )}
             {p.rulers && (
               <details className="mt-2 text-[12.5px]">
                 <summary className="cursor-pointer text-ink/60 hover:text-ink">
@@ -114,14 +121,18 @@ export function PeriodPanel({
                 const active = activeEvent === e.id
                 const past = e.year <= year
                 return (
-                  <button key={e.id} className={`ev-row ${active ? 'active' : ''} ${past ? '' : 'future'}`} onClick={() => onEvent(e)}>
+                  <div key={e.id}>
+                  <button className={`ev-row ${active ? 'active' : ''} ${past ? '' : 'future'}`} onClick={() => onEvent(e)}>
                     <span className="ev-year">{fmtYear(e.year, lang, true)}</span>
                     <span className="ev-dot" style={{ background: CAT_META[e.cat].color }}>{CAT_META[e.cat].icon}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium leading-snug">{pick(lang, e.title)}</span>
                       {active && <span className="mt-0.5 block text-[12.5px] leading-snug text-ink/75">{pick(lang, e.desc)}</span>}
                     </span>
+                    {TT[e.id] && <span className="tt-dot" title={tr(lang, 'toanthu')}>史</span>}
                   </button>
+                  {active && <Cite id={e.id} year={e.year} lang={lang} />}
+                  </div>
                 )
               })}
             </div>
@@ -129,6 +140,28 @@ export function PeriodPanel({
         </>
       )}
     </aside>
+  )
+}
+
+/* ───────────── Trích dẫn Đại Việt sử ký toàn thư ───────────── */
+function Cite({ id, year, lang }: { id: string; year: number; lang: Lang }) {
+  const c = TT[id]
+  if (c)
+    return (
+      <a className="tt-cite" href={volUrl(c.vol)} target="_blank" rel="noreferrer">
+        <span className="tt-badge">
+          📜 {tr(lang, 'toanthu')} · {volName(c.vol, lang)} · {lang === 'vi' ? 'năm' : 'year'} {canChi(year)}
+        </span>
+        <span className="tt-quote" lang="zh-Hant">「{c.quote}」</span>
+        {c.note && <span className="tt-sub">{pick(lang, c.note)}</span>}
+      </a>
+    )
+  const why = TT_ABSENT[id]
+  return (
+    <div className="tt-cite absent">
+      <span className="tt-badge">{year > TT_END ? tr(lang, 'afterTT') : tr(lang, 'notInTT')}</span>
+      {why && year <= TT_END && <span className="tt-sub">{pick(lang, why)}</span>}
+    </div>
   )
 }
 

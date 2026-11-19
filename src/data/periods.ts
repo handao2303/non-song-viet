@@ -124,8 +124,8 @@ export const PERIODS: Period[] = [
     id: 'ly', polity: 'ly', start: 1010, end: 1225,
     name: t('Nhà Lý', 'Lý dynasty'), title: t('Đại Cồ Việt → Đại Việt (1054)', 'Đại Việt (from 1054)'), founder: t('Lý Thái Tổ (Lý Công Uẩn)', 'Lý Thái Tổ'), capital: t('Thăng Long', 'Thăng Long'),
     summary: t(
-      'Dời đô ra Thăng Long (1010), dựng Văn Miếu (1070), mở khoa thi đầu tiên (1075). Lý Thường Kiệt phá Tống trên sông Như Nguyệt (1077). Mở cõi đến Quảng Trị (1069).',
-      'Moved the capital to Thăng Long (1010), built the Temple of Literature (1070), held the first exams (1075). Lý Thường Kiệt defeated the Song at Như Nguyệt (1077). Expanded to Quảng Trị (1069).',
+      'Dời đô ra Thăng Long (1010), dựng Văn Miếu (1070), mở khoa thi đầu tiên (1075). Lý Thường Kiệt phá Tống trên sông Như Nguyệt (1076). Mở cõi đến Quảng Trị (1069).',
+      'Moved the capital to Thăng Long (1010), built the Temple of Literature (1070), held the first exams (1075). Lý Thường Kiệt defeated the Song at Như Nguyệt (1076). Expanded to Quảng Trị (1069).',
     ),
     rulers: ['Lý Thái Tổ', 'Lý Thái Tông', 'Lý Thánh Tông', 'Lý Nhân Tông', 'Lý Thần Tông', 'Lý Anh Tông', 'Lý Cao Tông', 'Lý Huệ Tông', 'Lý Chiêu Hoàng'],
     tt: { vol: 'BK2', note: t('“Lý kỷ” (Bản kỷ quyển 2–4): khởi Canh Tuất năm Thuận Thiên thứ nhất (1010), chung Ất Dậu (1225).', 'Lý annals, 1010–1225.') },

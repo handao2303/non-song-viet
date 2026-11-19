@@ -55,3 +55,12 @@ export const fold = (s: string) =>
     .replace(/[̀-ͯ]/g, '')
     .replace(/đ/gi, 'd')
     .toLowerCase()
+
+const CAN = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý']
+const CHI = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi']
+
+/** Năm can chi (Giáp Tý = năm 4); năm TCN theo cách tính thiên văn */
+export function canChi(y: number) {
+  const a = y > 0 ? y : y + 1
+  return `${CAN[(((a - 4) % 10) + 10) % 10]} ${CHI[(((a - 4) % 12) + 12) % 12]}`
+}

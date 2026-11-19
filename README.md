@@ -43,10 +43,15 @@ node scripts/build-geo.mjs   # tạo lại public/data từ scripts/raw
 - Láng giềng, sông ngòi: [Natural Earth](https://www.naturalearthdata.com/) (public domain)
 - Địa hình: AWS Terrain Tiles (SRTM, GMTED2010)
 
-**Nội dung lịch sử** (năm, triều đại, kinh đô, sự kiện, mốc mở cõi) được biên soạn tay theo các mốc phổ thông
-trong sách giáo khoa và sử liệu thông dụng; **chưa được đối chiếu từng dòng với tài liệu gốc**.
-Nên kiểm tra lại với *Đại Việt sử ký toàn thư*, *Đại Nam thực lục*, *Việt Nam sử lược* (Trần Trọng Kim)
-trước khi dùng cho mục đích học thuật. Góp ý sửa sai: mở issue trên GitHub.
+**Nội dung lịch sử — chuẩn: *Đại Việt sử ký toàn thư***
+- Niên đại, thời kỳ, đời vua từ Hồng Bàng đến năm 1789 được đối chiếu với **nguyên văn chữ Hán** của Toàn thư
+  (Ngoại kỷ 5 quyển, Bản kỷ 19 quyển, Tục biên 5 quyển) trên
+  [Wikisource 大越史記全書](https://zh.wikisource.org/wiki/大越史記全書), bằng cách đổi năm can chi sang dương lịch.
+- Mỗi sự kiện có trích quyển + một câu nguyên văn (`src/data/toanthu.ts`); app hiện trích dẫn khi bấm vào sự kiện.
+- Theo cách chia kỷ của Toàn thư: Âu Lạc 257–208 TCN, **nhà Triệu được xếp vào chính thống** (207–111 TCN),
+  Tiền Lý 541–602, Đinh 968–980, Tiền Lê 981–1009, Lý 1010–1225, Trần từ 1226, Hậu Trần 1407–1413…
+- Sự kiện Toàn thư không chép (khảo cổ, việc Đàng Trong, Tây Sơn khởi nghĩa 1771…) được đánh dấu rõ "ngoài Toàn thư".
+- Sau 1789 (nhà Nguyễn, thời Pháp, hiện đại): theo mốc phổ thông, **chưa đối chiếu** với tài liệu gốc.
 
 > Ranh giới là sơ đồ ước lượng dựng từ đơn vị tỉnh hiện đại, không phải bản đồ khảo sát.
 > Một số mốc (năm nhập Tây Ninh, Tây Nguyên, phạm vi Tây Sơn – Nguyễn Ánh) đã được đơn giản hoá.
