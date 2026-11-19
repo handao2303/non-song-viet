@@ -20,6 +20,7 @@ export function PeriodPanel({
   onYear,
   focusPolity,
   onFocusPolity,
+  onOpenTT,
 }: {
   year: number
   lang: Lang
@@ -29,6 +30,7 @@ export function PeriodPanel({
   onYear: (y: number) => void
   focusPolity: string | null
   onFocusPolity: (p: string | null) => void
+  onOpenTT: (id: string) => void
 }) {
   const p = periodAt(year)
   const [open, setOpen] = useState(() => window.innerWidth >= 768)
@@ -82,10 +84,11 @@ export function PeriodPanel({
             </dl>
             <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink/85">{pick(lang, p.summary)}</p>
             {p.tt && (
-              <a className="tt-note" href={volUrl(p.tt.vol)} target="_blank" rel="noreferrer">
+              <div className="tt-note">
                 <span className="tt-badge">📜 {tr(lang, 'toanthu')} · {volName(p.tt.vol, lang)}</span>
                 {pick(lang, p.tt.note)}
-              </a>
+                <a className="tt-ext" href={volUrl(p.tt.vol)} target="_blank" rel="noreferrer">Wikisource ↗</a>
+              </div>
             )}
             {p.rulers && (
               <details className="mt-2 text-[12.5px]">
@@ -143,7 +146,7 @@ export function PeriodPanel({
                     </span>
                     {TT[e.id] && <span className="tt-dot" title={tr(lang, 'toanthu')}>史</span>}
                   </button>
-                  {active && <Cite id={e.id} year={e.year} lang={lang} />}
+                  {active && <Cite id={e.id} year={e.year} lang={lang} onOpen={onOpenTT} />}
                   </div>
                 )
               })}
@@ -156,17 +159,18 @@ export function PeriodPanel({
 }
 
 /* ───────────── Trích dẫn Đại Việt sử ký toàn thư ───────────── */
-function Cite({ id, year, lang }: { id: string; year: number; lang: Lang }) {
+function Cite({ id, year, lang, onOpen }: { id: string; year: number; lang: Lang; onOpen: (id: string) => void }) {
   const c = TT[id]
   if (c)
     return (
-      <a className="tt-cite" href={volUrl(c.vol)} target="_blank" rel="noreferrer">
+      <button className="tt-cite" onClick={() => onOpen(id)}>
         <span className="tt-badge">
           📜 {tr(lang, 'toanthu')} · {volName(c.vol, lang)} · {lang === 'vi' ? 'năm' : 'year'} {canChi(year)}
         </span>
         <span className="tt-quote" lang="zh-Hant">「{c.quote}」</span>
         {c.note && <span className="tt-sub">{pick(lang, c.note)}</span>}
-      </a>
+        <span className="tt-more">{lang === 'vi' ? 'Đọc đoạn nguyên văn →' : 'Read the passage →'}</span>
+      </button>
     )
   const why = TT_ABSENT[id]
   return (

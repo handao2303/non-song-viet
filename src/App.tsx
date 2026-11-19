@@ -6,6 +6,7 @@ import Header, { type SearchHit } from './components/Header'
 import { PeriodPanel, TracePanel } from './components/Panels'
 import NowCard from './components/NowCard'
 import Guide, { guideSeen } from './components/Guide'
+import TTViewer from './components/TTViewer'
 import { areaSeries, loadGeo, territoryAt, type GeoData } from './lib/geo'
 import { traceAt } from './lib/trace'
 import { useUrlState } from './lib/url'
@@ -30,6 +31,8 @@ export default function App() {
   const [activeEvent, setActiveEvent] = useState<string | null>(null)
   const [focusPolity, setFocusPolity] = useState<string | null>(null)
   const [guide, setGuide] = useState(() => !guideSeen())
+  const [ttOpen, setTtOpen] = useState<string | null>(null)
+  const closeTT = useCallback(() => setTtOpen(null), [])
   const tourTimer = useRef<number | null>(null)
 
   useEffect(() => {
@@ -79,13 +82,15 @@ export default function App() {
       else if (e.key === 'ArrowLeft') setYear(year - (e.shiftKey ? 10 : 1))
       else if (e.key === 'PageDown' || e.key === ']') setYear(STOPS.find((s) => s > year) ?? year)
       else if (e.key === 'PageUp' || e.key === '[') setYear([...STOPS].reverse().find((s) => s < year) ?? year)
-      else if (e.key === 'Escape') setUrl((s) => ({ ...s, trace: null }))
+      else if (e.key === 'Escape') {
+        if (!ttOpen) setUrl((s) => ({ ...s, trace: null }))
+      }
       else return
       e.preventDefault()
     }
     window.addEventListener('keydown', k)
     return () => window.removeEventListener('keydown', k)
-  }, [year, setYear, setUrl])
+  }, [year, setYear, setUrl, ttOpen])
 
   const onEvent = useCallback(
     (e: HistEvent) => {
@@ -179,6 +184,7 @@ export default function App() {
         activeEvent={activeEvent}
         focusPolity={focusPolity}
         onFocusPolity={setFocusPolity}
+        onOpenTT={setTtOpen}
         onEvent={(e) => {
           stopTour()
           onEvent(e)
@@ -217,6 +223,7 @@ export default function App() {
         />
         <p className="mt-1.5 px-1 text-[10.5px] text-ink/50 max-sm:hidden">{tr(lang, 'disclaimer')}</p>
       </div>
+      {ttOpen && <TTViewer id={ttOpen} lang={lang} onClose={closeTT} />}
       {guide && <Guide lang={lang} onClose={() => setGuide(false)} onTour={startTour} />}
     </main>
   )
