@@ -6,7 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import type { GeoData } from '../lib/geo'
 import { shapesToGeoJSON, territoryAt } from '../lib/geo'
-import { neighborPolity } from '../data/territory'
+import { neighborPolity, recentGain } from '../data/territory'
 import { POLITIES } from '../data/polities'
 import { capitalsAt } from '../data/capitals'
 import { CAT_META, eventsNear } from '../data/events'
@@ -36,6 +36,7 @@ interface Props {
   trace: [number, number] | null
   fly: FlyTarget | null
   activeEvent: string | null
+  focusPolity: string | null
   onTrace: (p: [number, number]) => void
   onEvent: (e: HistEvent) => void
 }
@@ -72,6 +73,7 @@ const style: StyleSpecification = {
     neighbors: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     polities: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     borders: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+    gained: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     provinces: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     rivers: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     line17: {
@@ -117,6 +119,9 @@ const style: StyleSpecification = {
     { id: 'provinces-line', type: 'line', source: 'provinces', paint: { 'line-color': INK, 'line-width': 0.4, 'line-opacity': 0.35, 'line-dasharray': [2, 2] } },
     { id: 'neighbors-line', type: 'line', source: 'neighbors', paint: { 'line-color': INK, 'line-width': 0.7, 'line-opacity': 0.4 } },
     { id: 'vn-coast', type: 'line', source: 'polities', paint: { 'line-color': INK, 'line-width': 0.5, 'line-opacity': 0.25 } },
+    { id: 'gained-fill', type: 'fill', source: 'gained', paint: { 'fill-color': '#2e9d6f', 'fill-opacity': 0.28 } },
+    { id: 'gained-glow', type: 'line', source: 'gained', paint: { 'line-color': '#2e9d6f', 'line-width': 7, 'line-opacity': 0.35, 'line-blur': 4 } },
+    { id: 'gained-line', type: 'line', source: 'gained', paint: { 'line-color': '#1d7a52', 'line-width': 1.6, 'line-dasharray': [2, 1] } },
     { id: 'borders-halo', type: 'line', source: 'borders', paint: { 'line-color': '#fff8e8', 'line-width': 4, 'line-opacity': 0.6, 'line-blur': 1 } },
     { id: 'borders', type: 'line', source: 'borders', paint: { 'line-color': '#5a2a1a', 'line-width': 1.4, 'line-opacity': 0.85 } },
     { id: 'line17', type: 'line', source: 'line17', layout: { visibility: 'none' }, paint: { 'line-color': '#7a1010', 'line-width': 2.2, 'line-dasharray': [2, 1.2] } },
@@ -135,7 +140,7 @@ function safely(fn: () => void, tries = 40) {
 
 type MarkerItem = { id: string; coord: [number, number]; node: React.ReactNode; z?: number }
 
-export default function MapView({ geo, year, lang, layers, trace, fly, activeEvent, onTrace, onEvent }: Props) {
+export default function MapView({ geo, year, lang, layers, trace, fly, activeEvent, focusPolity, onTrace, onEvent }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MLMap | null>(null)
   const [readyMap, setReadyMap] = useState<MLMap | null>(null)
@@ -206,6 +211,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     safely(() => {
     ;(map.getSource('polities') as GeoJSONSource).setData(shapesToGeoJSON(terr.shapes))
     ;(map.getSource('borders') as GeoJSONSource).setData({ type: 'Feature', properties: {}, geometry: terr.borders })
+    ;(map.getSource('gained') as GeoJSONSource).setData({ type: 'FeatureCollection', features: geo.provinces.features.filter((f) => recentGain(f.properties.id, year)) })
     const match: unknown[] = ['match', ['get', 'id']]
     const op: unknown[] = ['match', ['get', 'id']]
     for (const id of Object.keys(NEIGHBOR_ANCHORS).concat('taiwan')) {
@@ -219,7 +225,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     map.setPaintProperty('neighbors-tint', 'fill-opacity', op as never)
     map.setLayoutProperty('line17', 'visibility', year >= 1954 && year <= 1975 ? 'visible' : 'none')
     })
-  }, [terr, ready, year])
+  }, [terr, ready, year, geo])
 
   // Bật / tắt lớp
   useEffect(() => {
@@ -231,11 +237,22 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     vis('borders', layers.territories)
     vis('borders-halo', layers.territories)
     vis('neighbors-tint', layers.territories)
+    for (const id of ['gained-fill', 'gained-glow', 'gained-line']) vis(id, layers.territories)
     vis('rivers', layers.rivers)
     vis('hillshade', layers.relief)
     vis('provinces-line', layers.modern)
     })
   }, [layers, ready])
+
+  // Làm nổi một thế lực khi rê chuột vào chú thích
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !ready) return
+    safely(() => {
+      const base = ['match', ['get', 'kind'], 'culture', 0.32, 'neighbor', 0.5, 'chinese', 0.5, 0.66]
+      map.setPaintProperty('polity-fill', 'fill-opacity', (focusPolity ? ['case', ['==', ['get', 'polity'], focusPolity], 0.88, 0.1] : base) as never)
+    })
+  }, [focusPolity, ready])
 
   // Bay tới vị trí
   useEffect(() => {

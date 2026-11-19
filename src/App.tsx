@@ -4,6 +4,8 @@ import MapView, { type FlyTarget, type Layers } from './components/MapView'
 import Timeline from './components/Timeline'
 import Header, { type SearchHit } from './components/Header'
 import { PeriodPanel, TracePanel } from './components/Panels'
+import NowCard from './components/NowCard'
+import Guide, { guideSeen } from './components/Guide'
 import { areaSeries, loadGeo, territoryAt, type GeoData } from './lib/geo'
 import { traceAt } from './lib/trace'
 import { useUrlState } from './lib/url'
@@ -26,6 +28,8 @@ export default function App() {
   const [speed, setSpeed] = useState(1)
   const [fly, setFly] = useState<FlyTarget | null>(null)
   const [activeEvent, setActiveEvent] = useState<string | null>(null)
+  const [focusPolity, setFocusPolity] = useState<string | null>(null)
+  const [guide, setGuide] = useState(() => !guideSeen())
   const tourTimer = useRef<number | null>(null)
 
   useEffect(() => {
@@ -151,6 +155,7 @@ export default function App() {
         trace={trace}
         fly={fly}
         activeEvent={activeEvent}
+        focusPolity={focusPolity}
         onTrace={(p) => setUrl((s) => ({ ...s, trace: p }))}
         onEvent={(e) => {
           stopTour()
@@ -165,12 +170,15 @@ export default function App() {
         onLayers={setLayers}
         onPick={onPick}
         onTour={startTour}
+        onHelp={() => setGuide(true)}
       />
       <PeriodPanel
         year={year}
         lang={lang}
         shapes={terr.shapes}
         activeEvent={activeEvent}
+        focusPolity={focusPolity}
+        onFocusPolity={setFocusPolity}
         onEvent={(e) => {
           stopTour()
           onEvent(e)
@@ -183,8 +191,9 @@ export default function App() {
       {trace && traceRes && traceRes.kind !== 'sea' && (
         <TracePanel result={traceRes} coord={trace} year={year} lang={lang} onYear={setYear} onClose={() => setUrl((s) => ({ ...s, trace: null }))} />
       )}
+      <NowCard year={year} lang={lang} provinceIds={geo.ids} names={geo.names} />
       {!trace && (
-        <div className="hint glass max-lg:hidden">
+        <div className="hint glass max-xl:hidden">
           <span className="text-base">⌖</span> {tr(lang, 'traceHint')}
         </div>
       )}
@@ -208,6 +217,7 @@ export default function App() {
         />
         <p className="mt-1.5 px-1 text-[10.5px] text-ink/50 max-sm:hidden">{tr(lang, 'disclaimer')}</p>
       </div>
+      {guide && <Guide lang={lang} onClose={() => setGuide(false)} onTour={startTour} />}
     </main>
   )
 }

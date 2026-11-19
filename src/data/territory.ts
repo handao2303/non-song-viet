@@ -49,7 +49,7 @@ export const PROVINCE_REGION: Record<string, Region> = {
 }
 
 /** Năm vùng chính thức nhập vào quốc gia Việt (lần cuối, ổn định) */
-const ANNEX: Record<Region, number> = {
+export const ANNEX: Record<Region, number> = {
   core: -9999, caobang: -9999, thanhnghe: -9999,
   taybac: 1432, qbinh: 1069, qtri: 1069, hue: 1306,
   qnam: 1471, qngai: 1471, bdinh: 1471, pyen: 1611, khoa: 1653, nthuan: 1693,
@@ -194,3 +194,13 @@ export const CHANGE_YEARS = [
   1402, 1407, 1414, 1428, 1432, 1471, 1527, 1543, 1593, 1600, 1611, 1653, 1677, 1693, 1698, 1708, 1732, 1756, 1757, 1773, 1775, 1777,
   1786, 1788, 1793, 1799, 1801, 1802, 1804, 1836, 1839, 1862, 1867, 1884, 1898, 1945, 1954, 1955, 1975, 1976,
 ]
+
+/** Vùng vừa nhập vào lãnh thổ trong vòng `win` năm gần đây (để tô sáng trên bản đồ) */
+export function recentGain(pid: string, y: number, win = 8): { region: Region; year: number } | null {
+  const r = PROVINCE_REGION[pid]
+  if (!r) return null
+  if ((r === 'qnam' || r === 'qngai') && y >= 1402 && y < 1402 + win && y < 1407) return { region: r, year: 1402 }
+  const a = ANNEX[r]
+  if (a > -9999 && y >= a && y < a + win) return { region: r, year: a }
+  return null
+}

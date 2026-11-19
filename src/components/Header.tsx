@@ -24,9 +24,10 @@ interface Props {
   onLayers: (l: Layers) => void
   onPick: (h: SearchHit) => void
   onTour: () => void
+  onHelp: () => void
 }
 
-export default function Header({ lang, layers, provinces, onLang, onLayers, onPick, onTour }: Props) {
+export default function Header({ lang, layers, provinces, onLang, onLayers, onPick, onTour, onHelp }: Props) {
   const [menu, setMenu] = useState(false)
   const [q, setQ] = useState('')
   const [focus, setFocus] = useState(false)
@@ -145,6 +146,10 @@ export default function Header({ lang, layers, provinces, onLang, onLayers, onPi
           </div>
         )}
       </div>
+
+      <button className="glass pointer-events-auto h-11 w-11 rounded-xl text-[15px] font-semibold hover:bg-white/60" onClick={onHelp} aria-label={lang === 'vi' ? 'Hướng dẫn' : 'Help'} title={lang === 'vi' ? 'Hướng dẫn' : 'Help'}>
+        ?
+      </button>
 
       <div className="glass pointer-events-auto flex h-11 items-center rounded-xl p-1 text-[12.5px] font-semibold">
         {(['vi', 'en'] as Lang[]).map((l) => (

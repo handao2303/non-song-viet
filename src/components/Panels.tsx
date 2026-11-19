@@ -18,6 +18,8 @@ export function PeriodPanel({
   activeEvent,
   onEvent,
   onYear,
+  focusPolity,
+  onFocusPolity,
 }: {
   year: number
   lang: Lang
@@ -25,6 +27,8 @@ export function PeriodPanel({
   activeEvent: string | null
   onEvent: (e: HistEvent) => void
   onYear: (y: number) => void
+  focusPolity: string | null
+  onFocusPolity: (p: string | null) => void
 }) {
   const p = periodAt(year)
   const [open, setOpen] = useState(() => window.innerWidth >= 768)
@@ -105,10 +109,18 @@ export function PeriodPanel({
             <div className="mb-1.5 text-[11px] uppercase tracking-[.16em] text-ink/55">{tr(lang, 'onMap')}</div>
             <div className="flex flex-wrap gap-1.5">
               {powers.map((s) => (
-                <span key={s.polity} className="legend-chip">
+                <button
+                  key={s.polity}
+                  className={`legend-chip ${focusPolity === s.polity ? 'on' : ''}`}
+                  onMouseEnter={() => onFocusPolity(s.polity)}
+                  onMouseLeave={() => onFocusPolity(null)}
+                  onClick={() => onFocusPolity(focusPolity === s.polity ? null : s.polity)}
+                  title={`${pick(lang, POLITIES[s.polity].dynasty)} · ≈ ${Math.round(s.area).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US')} km²`}
+                >
                   <i style={{ background: POLITIES[s.polity].color }} />
                   {pick(lang, POLITIES[s.polity].name(year))}
-                </span>
+                  <small>{Math.round(s.area / 1000).toLocaleString()}k km²</small>
+                </button>
               ))}
             </div>
           </div>

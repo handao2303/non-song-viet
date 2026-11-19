@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { PERIODS } from '../data/periods'
+import { PERIODS, periodAt } from '../data/periods'
 import { POLITIES } from '../data/polities'
 import { EVENTS, CAT_META } from '../data/events'
 import type { Lang } from '../data/types'
@@ -15,6 +15,16 @@ interface Props {
   onYear: (y: number) => void
   onPlay: (p: boolean) => void
   onSpeed: (s: number) => void
+}
+
+/** Tên ngắn hiển thị trên dải thời kỳ */
+const SHORT: Record<string, [string, string]> = {
+  vanlang: ['Văn Lang', 'Văn Lang'], aulac: ['Âu Lạc', 'Âu Lạc'], trieu: ['Triệu', 'Triệu'], bt1: ['Bắc thuộc', 'Chinese rule'],
+  trung: ['Trưng', 'Trưng'], bt2: ['Bắc thuộc', 'Chinese rule'], vanxuan: ['Tiền Lý', 'Early Lý'], bt3: ['Bắc thuộc', 'Chinese rule'],
+  tuchu: ['Khúc', 'Khúc'], ngo: ['Ngô', 'Ngô'], dinh: ['Đinh', 'Đinh'], tienle: ['Lê', 'Lê'], ly: ['Lý', 'Lý'], tran: ['Trần', 'Trần'],
+  ho: ['Hồ', 'Hồ'], hautran: ['H.Trần', 'L.Trần'], minh: ['Minh', 'Ming'], leso: ['Lê sơ', 'Later Lê'], mac: ['Mạc–Lê', 'Mạc–Lê'],
+  trinhnguyen: ['Trịnh – Nguyễn', 'Trịnh – Nguyễn'], tayson: ['Tây Sơn', 'Tây Sơn'], nguyen: ['Nguyễn', 'Nguyễn'], phap: ['Pháp thuộc', 'French'],
+  vndcch: ['VNDCCH', 'DRV'], chiacat: ['Hai miền', 'Divided'], chxhcn: ['CHXHCN', 'SRV'],
 }
 
 const TICKS = [-700, 1, 300, 600, 938, 1225, 1400, 1600, 1700, 1802, 1884, 1945, 1975, 2026]
@@ -87,7 +97,7 @@ export default function Timeline({ year, lang, area, playing, speed, onYear, onP
 
       <div
         ref={bar}
-        className="relative mx-3 mt-2 mb-1 h-[74px] cursor-pointer select-none touch-none"
+        className="relative mx-3 mt-2 mb-1 h-[78px] cursor-pointer select-none touch-none"
         onPointerDown={(e) => {
           dragging.current = true
           onYear(yearAt(e.clientX))
@@ -96,6 +106,7 @@ export default function Timeline({ year, lang, area, playing, speed, onYear, onP
         onPointerLeave={() => setHover(null)}
       >
         {/* sparkline diện tích */}
+        <span className="spark-cap">▲ {tr(lang, 'area')}</span>
         <svg viewBox="0 0 1000 40" preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-[34px] w-full">
           <defs>
             <linearGradient id="ag" x1="0" x2="0" y1="0" y2="1">
@@ -114,16 +125,17 @@ export default function Timeline({ year, lang, area, playing, speed, onYear, onP
           />
         ))}
         {/* dải thời kỳ */}
-        <div className="absolute inset-x-0 top-[42px] h-[16px] overflow-hidden rounded-[4px] ring-1 ring-ink/15">
+        <div className="absolute inset-x-0 top-[40px] h-[20px] overflow-hidden rounded-[5px] ring-1 ring-ink/15">
           {PERIODS.map((p) => {
             const a = yearToFrac(p.start)
             const b = yearToFrac(p.end + 1)
             const active = year >= p.start && year <= p.end
+            const label = SHORT[p.id]?.[lang === 'vi' ? 0 : 1]
             return (
               <div
                 key={p.id}
                 title={`${pick(lang, p.name)} (${fmtYear(p.start, lang, true)}–${fmtYear(p.end, lang, true)})`}
-                className="absolute inset-y-0 transition-[filter]"
+                className={`band absolute inset-y-0 transition-[filter] ${active ? 'active' : ''}`}
                 style={{
                   left: `${a * 100}%`,
                   width: `${(b - a) * 100}%`,
@@ -131,7 +143,9 @@ export default function Timeline({ year, lang, area, playing, speed, onYear, onP
                   filter: active ? 'none' : 'saturate(.55) brightness(1.1)',
                   boxShadow: 'inset -1px 0 0 rgba(255,250,240,.6)',
                 }}
-              />
+              >
+                {label && b - a > 0.028 && <span className="band-label">{label}</span>}
+              </div>
             )
           })}
         </div>
@@ -148,7 +162,7 @@ export default function Timeline({ year, lang, area, playing, speed, onYear, onP
         </div>
         {hover !== null && (
           <div className="hover-tip" style={{ left: `${yearToFrac(hover) * 100}%` }}>
-            {fmtYear(hover, lang, true)}
+            {fmtYear(hover, lang, true)} · {pick(lang, periodAt(hover).name)}
           </div>
         )}
       </div>
