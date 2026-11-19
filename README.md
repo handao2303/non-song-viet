@@ -36,12 +36,17 @@ node scripts/build-geo.mjs   # tạo lại public/data từ scripts/raw
 | `src/data/events.ts` | Sự kiện song ngữ có toạ độ (thêm 1 dòng vào `rows` để thêm sự kiện) |
 | `src/data/capitals.ts` | Kinh đô, trị sở đô hộ, kinh đô Chăm Pa, cảng thị |
 
-## Nguồn
+## Nguồn dữ liệu
 
+**Bản đồ (tải trực tiếp, có giấy phép mở):**
 - Ranh giới tỉnh: [geoBoundaries](https://www.geoboundaries.org/) VNM ADM1 (CC BY 4.0) — 63 tỉnh trước sáp nhập 2025
 - Láng giềng, sông ngòi: [Natural Earth](https://www.naturalearthdata.com/) (public domain)
 - Địa hình: AWS Terrain Tiles (SRTM, GMTED2010)
-- Nội dung lịch sử: *Đại Việt sử ký toàn thư*, *Việt Nam sử lược* (Trần Trọng Kim), *Lịch sử Việt Nam* (Viện Sử học), Wikipedia tiếng Việt
+
+**Nội dung lịch sử** (năm, triều đại, kinh đô, sự kiện, mốc mở cõi) được biên soạn tay theo các mốc phổ thông
+trong sách giáo khoa và sử liệu thông dụng; **chưa được đối chiếu từng dòng với tài liệu gốc**.
+Nên kiểm tra lại với *Đại Việt sử ký toàn thư*, *Đại Nam thực lục*, *Việt Nam sử lược* (Trần Trọng Kim)
+trước khi dùng cho mục đích học thuật. Góp ý sửa sai: mở issue trên GitHub.
 
 > Ranh giới là sơ đồ ước lượng dựng từ đơn vị tỉnh hiện đại, không phải bản đồ khảo sát.
 > Một số mốc (năm nhập Tây Ninh, Tây Nguyên, phạm vi Tây Sơn – Nguyễn Ánh) đã được đơn giản hoá.
