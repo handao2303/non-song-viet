@@ -11,7 +11,7 @@ import { StoryPicker, StoryPlayer } from './components/Story'
 import IslandsPanel from './components/Islands'
 import CompareBar from './components/Compare'
 import { PaperOverlay, PeriodStamp, Splash } from './components/Atmosphere'
-import { STORIES } from './data/stories'
+import { BATTLE_RANGES, STORIES } from './data/stories'
 import type { Map as MLMap } from 'maplibre-gl'
 import { areaSeries, loadGeo, territoryAt, type GeoData } from './lib/geo'
 import { traceAt } from './lib/trace'
@@ -74,7 +74,10 @@ export default function App() {
     let last = performance.now()
     let f = yearToFrac(year)
     const tick = (now: number) => {
-      f += ((now - last) / 1000) * (speed / 90)
+      // đi chậm lại khi đang có trận đánh để kịp thấy mũi tên tiến quân
+      const y = fracToYear(f)
+      const slow = BATTLE_RANGES.some(([a, z]) => y >= a && y <= z) ? 0.18 : 1
+      f += ((now - last) / 1000) * (speed / 90) * slow
       last = now
       if (f >= 1) {
         setYear(2026)
@@ -204,6 +207,7 @@ export default function App() {
         focusPolity={focusPolity}
         story={storyState}
         syncGroup={syncGroup}
+        onStory={openStory}
         onIslands={() => {
           setIslands(true)
           setUrl((s) => ({ ...s, trace: null }))
@@ -286,7 +290,7 @@ export default function App() {
       {trace && traceRes && traceRes.kind !== 'sea' && (
         <TracePanel result={traceRes} coord={trace} year={year} lang={lang} onYear={setYear} onClose={() => setUrl((s) => ({ ...s, trace: null }))} />
       )}
-      {!story && cmp === null && <NowCard year={year} lang={lang} provinceIds={geo.ids} names={geo.names} />}
+      {!story && cmp === null && !trace && !islands && <NowCard year={year} lang={lang} provinceIds={geo.ids} names={geo.names} />}
       {story && storyState && <StoryPlayer story={story} step={storyState.step} lang={lang} onStep={setStep} onClose={closeStory} />}
       {!trace && !story && !islands && cmp === null && (
         <div className="hint glass max-xl:hidden">

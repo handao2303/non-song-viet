@@ -1008,3 +1008,34 @@ export const STORIES: Story[] = [...battles, ...people]
 export const BATTLES = battles
 export const PEOPLE = people
 export const storyByEvent = (eventId: string) => battles.find((s) => s.event === eventId)
+
+/** Năm của từng bước (bước không ghi năm thì lấy năm của bước trước) */
+export function stepYears(s: Story): number[] {
+  let y = s.year
+  return s.steps.map((st) => (y = st.year ?? y))
+}
+
+/** Khoảng năm một trận đánh được hiện tự động trên dòng thời gian */
+export const BATTLE_RANGES: [number, number, string][] = battles.map((b) => {
+  const ys = stepYears(b)
+  return [Math.min(b.year, ...ys), Math.max(...ys) + 2, b.id]
+})
+
+export interface LiveState {
+  battles: { s: Story; step: number }[]
+  people: { s: Story; step: number }[]
+}
+
+/** Trận đánh và nhân vật đang "sống" ở năm y — để hiện tự động khi dòng thời gian chạy */
+export function liveAt(y: number): LiveState {
+  const pick = (s: Story) => {
+    const ys = stepYears(s)
+    let i = 0
+    for (let k = 0; k < ys.length; k++) if (ys[k] <= y) i = k
+    return i
+  }
+  return {
+    battles: battles.filter((b) => BATTLE_RANGES.some(([a, z, id]) => id === b.id && y >= a && y <= z)).map((s) => ({ s, step: pick(s) })),
+    people: people.filter((p) => p.life && y >= p.life[0] && y <= p.life[1]).map((s) => ({ s, step: pick(s) })),
+  }
+}

@@ -13,6 +13,7 @@ import { CAT_META, eventsNear } from '../data/events'
 import type { HistEvent, Lang } from '../data/types'
 import { pick } from '../lib/i18n'
 import type { Arrow, LngLat, MarkIcon, Story } from '../data/stories'
+import { liveAt } from '../data/stories'
 import { ISLANDS, ARCHIPELAGOS } from '../data/islands'
 import Portrait from './Portrait'
 
@@ -46,6 +47,7 @@ interface Props {
   compare?: boolean
   syncGroup?: Set<MLMap>
   onIslands?: () => void
+  onStory?: (id: string) => void
   onTrace: (p: [number, number]) => void
   onEvent: (e: HistEvent) => void
 }
@@ -213,7 +215,7 @@ function arrowHead(map: MLMap, path: LngLat[], px: number): LngLat[] | null {
 
 type MarkerItem = { id: string; coord: [number, number]; node: React.ReactNode; z?: number }
 
-export default function MapView({ geo, year, lang, layers, trace, fly, activeEvent, focusPolity, story, compare, syncGroup, onIslands, onTrace, onEvent }: Props) {
+export default function MapView({ geo, year, lang, layers, trace, fly, activeEvent, focusPolity, story, compare, syncGroup, onIslands, onStory, onTrace, onEvent }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MLMap | null>(null)
   const [readyMap, setReadyMap] = useState<MLMap | null>(null)
@@ -386,6 +388,34 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     })
   }, [focusPolity, ready])
 
+  // Trận đánh / nhân vật tự hiện theo năm khi không mở câu chuyện nào
+  const live = !story && !compare && layers.events ? liveAt(year) : null
+  const liveKey = live ? live.battles.map((b) => `${b.s.id}:${b.step}`).join('|') : ''
+  const spec = useMemo(() => {
+    type C = { a: Arrow; color: string }
+    if (story) {
+      const { s, step } = story
+      const col = (a: Arrow) => (s.kind === 'life' ? SIDE_COLOR.life : SIDE_COLOR[a.side])
+      return {
+        past: s.steps.slice(0, step).flatMap((x) => (x.arrows ?? []).map((a): C => ({ a, color: col(a) }))),
+        cur: (s.steps[step]?.arrows ?? []).map((a): C => ({ a, color: col(a) })),
+        head: 17,
+      }
+    }
+    if (!liveKey) return null
+    const past: C[] = []
+    const cur: C[] = []
+    for (const part of liveKey.split('|')) {
+      const [id, st] = part.split(':')
+      const b = live!.battles.find((x) => x.s.id === id)!.s
+      const step = Number(st)
+      b.steps.slice(0, step).forEach((x) => (x.arrows ?? []).forEach((a) => past.push({ a, color: SIDE_COLOR[a.side] })))
+      ;(b.steps[step].arrows ?? []).forEach((a) => cur.push({ a, color: SIDE_COLOR[a.side] }))
+    }
+    return { past, cur, head: 12 }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [story, liveKey])
+
   // Diễn biến trận đánh / hành trình: vẽ mũi tên chạy dần
   useEffect(() => {
     const map = mapRef.current
@@ -394,7 +424,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     const heads = map.getSource('story-heads') as GeoJSONSource | undefined
     const dots = map.getSource('story-dots') as GeoJSONSource | undefined
     if (!lines || !heads || !dots) return
-    if (!story) {
+    if (!spec) {
       safely(() => {
         lines.setData({ type: 'FeatureCollection', features: [] })
         heads.setData({ type: 'FeatureCollection', features: [] })
@@ -402,10 +432,10 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       })
       return
     }
-    const { s, step } = story
-    const past = s.steps.slice(0, step).flatMap((x) => x.arrows ?? [])
-    const cur = s.steps[step]?.arrows ?? []
-    const color = (a: Arrow) => (s.kind === 'life' ? SIDE_COLOR.life : SIDE_COLOR[a.side])
+    const past = spec.past.map((x) => x.a)
+    const cur = spec.cur.map((x) => x.a)
+    const colors = new Map<Arrow, string>([...spec.past, ...spec.cur].map((x) => [x.a, x.color]))
+    const color = (a: Arrow) => colors.get(a) ?? SIDE_COLOR.vn
     let f = 0
     const draw = () => {
       const L: GeoJSON.Feature[] = []
@@ -416,7 +446,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
         const props = { color: color(a), cur: isCur, dash: !!(a.retreat || a.line) }
         L.push({ type: 'Feature', properties: props, geometry: { type: 'LineString', coordinates: p } })
         if (!a.line) {
-          const h = arrowHead(map, p, isCur ? 17 : 12)
+          const h = arrowHead(map, p, isCur ? spec.head : spec.head * 0.7)
           if (h) H.push({ type: 'Feature', properties: props, geometry: { type: 'Polygon', coordinates: [h] } })
         }
       }
@@ -427,7 +457,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     }
     let raf = 0
     let lastDots = 0
-    const t0 = performance.now() + 500 // chờ camera bay tới
+    const t0 = performance.now() + (story ? 500 : 0) // chờ camera bay tới
     // "quân" chạy liên tục dọc các mũi tên của bước hiện tại
     const moving = cur.filter((a) => !a.line)
     const drawDots = (now: number) => {
@@ -461,7 +491,8 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       cancelAnimationFrame(raf)
       map.off('zoom', onZoom)
     }
-  }, [story, ready])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spec, ready])
 
   // Chừa chỗ cho bảng câu chuyện bên phải
   useEffect(() => {
@@ -556,6 +587,56 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       }),
     )
   }
+  if (live) {
+    for (const { s: b, step } of live.battles) {
+      const st = b.steps[step]
+      const m = st.marks?.find((x) => x.icon === 'win' || x.icon === 'fall' || x.icon === 'star') ?? st.marks?.[0]
+      const at = m?.coord ?? st.arrows?.[0]?.path.at(-1) ?? b.view.center
+      items.push({
+        id: `lb-${b.id}`,
+        coord: at,
+        z: 7,
+        node: (
+          <button
+            className="live-battle"
+            onClick={(ev) => {
+              ev.stopPropagation()
+              onStory?.(b.id)
+            }}
+          >
+            <span className="lb-ic">⚔</span>
+            <span className="min-w-0">
+              <b>{pick(lang, b.title)}</b>
+              <small>{pick(lang, st.title)} · ▶ {lang === 'vi' ? 'xem diễn biến' : 'replay'}</small>
+            </span>
+          </button>
+        ),
+      })
+    }
+    for (const { s: p, step } of live.people) {
+      const st = p.steps[step]
+      const c = st.view?.center ?? p.view.center
+      items.push({
+        id: `lp-${p.id}`,
+        coord: c,
+        z: 6,
+        node: (
+          <button
+            className="live-person"
+            title={`${pick(lang, p.title)} — ${pick(lang, st.title)}`}
+            onClick={(ev) => {
+              ev.stopPropagation()
+              onStory?.(p.id)
+            }}
+          >
+            <Portrait id={p.id} size={zoom > 6.5 ? 48 : 38} />
+            <span className="lp-name">{pick(lang, p.title)}</span>
+            {zoom > 6.2 && <span className="lp-what">{pick(lang, st.title)}</span>}
+          </button>
+        ),
+      })
+    }
+  }
   if (layers.islands && !compare) {
     for (const a of ARCHIPELAGOS) {
       items.push({
@@ -581,7 +662,9 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
         items.push({ id: `isl-${i.id}`, coord: i.coord, z: 1, node: <div className="isl-label">{pick(lang, i.name)}</div> })
   }
   if (layers.events && !story) {
+    const shown = new Set(live?.battles.map((b) => b.s.event))
     for (const e of eventsNear(year)) {
+      if (shown.has(e.id)) continue
       const m = CAT_META[e.cat]
       const fresh = year - e.year <= 2 || (e.endYear && year <= e.endYear)
       items.push({

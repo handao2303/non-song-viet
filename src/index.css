@@ -1100,3 +1100,26 @@ button.tt-cite:hover {
   .stamp { display: none; }
 }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── Trận đánh, nhân vật tự hiện theo dòng thời gian ── */
+.live-battle {
+  display: flex; align-items: center; gap: 7px; padding: 4px 10px 4px 4px; border-radius: 999px;
+  background: rgb(255 250 240 / .95); border: 1.5px solid #c0392b; box-shadow: 0 3px 14px rgb(120 20 10 / .3);
+  text-align: left; white-space: nowrap; translate: 46% -34px; animation: live-in .45s cubic-bezier(.3,1.5,.5,1);
+}
+.live-battle .lb-ic { position: relative; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #c0392b; color: #fff; font-size: 13px; }
+.live-battle .lb-ic::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid #c0392b; animation: ripple 1.5s ease-out infinite; }
+.live-battle b { display: block; font-family: var(--font-serif); font-size: 13px; line-height: 1.15; }
+.live-battle small { display: block; font-size: 10.5px; color: rgb(47 39 29 / .65); }
+.live-battle:hover { background: #fff; }
+.live-person { display: flex; flex-direction: column; align-items: center; gap: 2px; animation: live-in .5s cubic-bezier(.3,1.5,.5,1); }
+.live-person .portrait { box-shadow: 0 0 0 2.5px #fffaf0, 0 4px 12px rgb(47 39 29 / .35); transition: transform .2s; }
+.live-person:hover .portrait { transform: scale(1.12); }
+.live-person .lp-name { padding: 0 6px; border-radius: 6px; background: rgb(255 250 240 / .92); font-family: var(--font-serif); font-size: 11.5px; font-weight: 600; white-space: nowrap; box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
+.live-person .lp-what { font-size: 10px; color: rgb(47 39 29 / .7); white-space: nowrap; text-shadow: 0 0 3px #fffaf0, 0 0 3px #fffaf0; }
+@keyframes live-in { from { opacity: 0; transform: scale(.4); } }
+
+/* Thẻ năm sang góc phải để không che miền Bắc; gợi ý xuống dưới */
+.now-card { left: auto; right: 56px; transform: none; align-items: flex-end; text-align: right; max-width: min(440px, calc(100vw - 460px)); min-width: 0; }
+.hint { top: auto; bottom: 214px; right: 12px; }
+@media (max-width: 1100px) { .now-card { right: 12px; } }
