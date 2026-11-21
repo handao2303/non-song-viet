@@ -14,6 +14,7 @@ import type { HistEvent, Lang } from '../data/types'
 import { pick } from '../lib/i18n'
 import type { Arrow, LngLat, MarkIcon, Story } from '../data/stories'
 import { ISLANDS, ARCHIPELAGOS } from '../data/islands'
+import Portrait from './Portrait'
 
 export interface Layers {
   territories: boolean
@@ -484,7 +485,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
           z: isCur ? 7 : 5,
           node: (
             <div className={`story-mark ${m.icon} ${isCur ? 'cur' : 'past'} ${st.kind}`}>
-              <span className="sm-ic">{MARK_ICON[m.icon]}</span>
+              {st.kind === 'life' && isCur ? <Portrait id={st.id} size={44} className="sm-portrait" /> : <span className="sm-ic">{MARK_ICON[m.icon]}</span>}
               {(isCur || zoom > 8) && <span className="sm-label">{pick(lang, m.label)}</span>}
             </div>
           ),

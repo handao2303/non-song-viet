@@ -1006,3 +1006,8 @@ button.tt-cite:hover {
 .tt-cite.dn { border-color: rgb(38 70 110 / 0.22); background: rgb(38 70 110 / 0.05); }
 .tt-cite.dn .tt-badge, .tt-cite.dn .tt-more { color: #26466e; }
 .tt-dot.dn { color: #26466e; border-color: rgb(38 70 110 / 0.35); }
+
+/* ── Chân dung ── */
+.portrait { display: block; border-radius: 50%; box-shadow: 0 2px 8px rgb(47 39 29 / 0.25); background: #fffaf0; }
+.story-mark .sm-portrait { animation: pop 0.5s ease-out; box-shadow: 0 3px 12px rgb(0 0 0 / 0.35), 0 0 0 3px #fffaf0; }
+.picker-card .portrait { margin-top: -2px; }

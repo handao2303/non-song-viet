@@ -3,6 +3,7 @@ import { BATTLES, PEOPLE, type Story } from '../data/stories'
 import type { Lang } from '../data/types'
 import { fmtYear } from '../lib/time'
 import { pick } from '../lib/i18n'
+import Portrait from './Portrait'
 
 /* ───────────── Trình phát diễn biến / hành trình ───────────── */
 export function StoryPlayer({
@@ -50,7 +51,7 @@ export function StoryPlayer({
   return (
     <section className="story-player glass" aria-live="polite">
       <div className="flex items-start gap-3">
-        {story.kind === 'life' && <span className="sp-glyph" lang="zh-Hant">{story.glyph}</span>}
+        {story.kind === 'life' && <Portrait id={story.id} size={64} className="shrink-0" />}
         <div className="min-w-0 flex-1">
           <div className="sp-kicker">
             {story.kind === 'battle' ? (vi ? '⚔ Diễn biến trận đánh' : '⚔ Battle replay') : vi ? '👤 Hành trình nhân vật' : '👤 A life on the map'} · {pick(lang, story.title)}
@@ -137,9 +138,11 @@ export function StoryPicker({ lang, initial, onPick, onClose }: { lang: Lang; in
         <div className="picker-grid">
           {list.map((s) => (
             <button key={s.id} className="picker-card" onClick={() => onPick(s.id)}>
-              <span className={`pc-glyph ${s.kind}`} lang="zh-Hant">
-                {s.kind === 'battle' ? '⚔' : s.glyph}
-              </span>
+              {s.kind === 'life' ? (
+                <Portrait id={s.id} size={58} className="shrink-0" />
+              ) : (
+                <span className="pc-glyph battle">⚔</span>
+              )}
               <span className="min-w-0">
                 <b>{pick(lang, s.title)}</b>
                 <span className="block text-[12px] leading-snug text-ink/65">{pick(lang, s.sub)}</span>
