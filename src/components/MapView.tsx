@@ -87,6 +87,7 @@ const style: StyleSpecification = {
     rivers: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     'story-lines': { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     'story-heads': { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+    'story-dots': { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     islands: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     line17: {
       type: 'geojson',
@@ -134,6 +135,8 @@ const style: StyleSpecification = {
     { id: 'gained-fill', type: 'fill', source: 'gained', paint: { 'fill-color': '#2e9d6f', 'fill-opacity': 0.28 } },
     { id: 'gained-glow', type: 'line', source: 'gained', paint: { 'line-color': '#2e9d6f', 'line-width': 7, 'line-opacity': 0.35, 'line-blur': 4 } },
     { id: 'gained-line', type: 'line', source: 'gained', paint: { 'line-color': '#1d7a52', 'line-width': 1.6, 'line-dasharray': [2, 1] } },
+    { id: 'polity-hover-glow', type: 'line', source: 'polities', filter: ['==', ['get', 'polity'], ''], paint: { 'line-color': ['get', 'color'], 'line-width': 10, 'line-opacity': 0.35, 'line-blur': 6 } },
+    { id: 'polity-hover', type: 'line', source: 'polities', filter: ['==', ['get', 'polity'], ''], paint: { 'line-color': '#fffaf0', 'line-width': 2.2, 'line-opacity': 0.95 } },
     { id: 'borders-halo', type: 'line', source: 'borders', paint: { 'line-color': '#fff8e8', 'line-width': 4, 'line-opacity': 0.6, 'line-blur': 1 } },
     { id: 'borders', type: 'line', source: 'borders', paint: { 'line-color': '#5a2a1a', 'line-width': 1.4, 'line-opacity': 0.85 } },
     { id: 'islands-box', type: 'line', source: 'islands', filter: ['==', ['get', 'k'], 'box'], paint: { 'line-color': '#86301f', 'line-width': 1.2, 'line-opacity': 0.55, 'line-dasharray': [3, 2] } },
@@ -141,6 +144,7 @@ const style: StyleSpecification = {
     { id: 'story-casing', type: 'line', source: 'story-lines', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#fffaf0', 'line-width': ['case', ['get', 'cur'], 8, 5], 'line-opacity': ['case', ['get', 'cur'], 0.85, 0.4] } },
     { id: 'story-line', type: 'line', source: 'story-lines', filter: ['!', ['get', 'dash']], layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': ['case', ['get', 'cur'], 4.2, 2.6], 'line-opacity': ['case', ['get', 'cur'], 0.95, 0.42] } },
     { id: 'story-dash', type: 'line', source: 'story-lines', filter: ['get', 'dash'], paint: { 'line-color': ['get', 'color'], 'line-width': ['case', ['get', 'cur'], 3.6, 2.4], 'line-opacity': ['case', ['get', 'cur'], 0.95, 0.42], 'line-dasharray': [1.6, 1.1] } },
+    { id: 'story-dots', type: 'circle', source: 'story-dots', paint: { 'circle-radius': 4.2, 'circle-color': ['get', 'color'], 'circle-stroke-color': '#fffaf0', 'circle-stroke-width': 1.6, 'circle-opacity': ['get', 'o'], 'circle-stroke-opacity': ['get', 'o'] } },
     { id: 'story-head', type: 'fill', source: 'story-heads', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': ['case', ['get', 'cur'], 0.95, 0.42] } },
     { id: 'line17', type: 'line', source: 'line17', layout: { visibility: 'none' }, paint: { 'line-color': '#7a1010', 'line-width': 2.2, 'line-dasharray': [2, 1.2] } },
   ],
@@ -220,6 +224,11 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
   const [slots, setSlots] = useState<Record<string, HTMLElement>>({})
   const onTraceRef = useRef(onTrace)
   onTraceRef.current = onTrace
+  const tipRef = useRef<HTMLDivElement>(null)
+  const yearRef = useRef(year)
+  yearRef.current = year
+  const langRef = useRef(lang)
+  langRef.current = lang
 
   // Khởi tạo bản đồ
   useEffect(() => {
@@ -258,6 +267,37 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       setReadyMap(map)
     })
     map.on('zoom', () => setZoom(map.getZoom()))
+    // Rê chuột vào một vùng lãnh thổ: viền sáng + nhãn tên
+    let hovered = ''
+    map.on('mousemove', 'polity-fill', (e) => {
+      const pid = e.features?.[0]?.properties?.polity as string | undefined
+      const tip = tipRef.current
+      if (!pid || !tip || !POLITIES[pid]) return
+      if (pid !== hovered) {
+        hovered = pid
+        const f: never = ['==', ['get', 'polity'], pid] as never
+        map.setFilter('polity-hover', f)
+        map.setFilter('polity-hover-glow', f)
+        const p = POLITIES[pid]
+        const L = langRef.current
+        const nm = pick(L, p.name(yearRef.current))
+        const dy = p.kind === 'neighbor' || p.kind === 'culture' ? '' : pick(L, p.dynasty)
+        tip.innerHTML = `<i style="background:${p.color}"></i><span><b></b><small></small></span>`
+        tip.querySelector('b')!.textContent = nm
+        tip.querySelector('small')!.textContent = dy
+      }
+      tip.style.display = 'flex'
+      tip.style.left = `${e.point.x}px`
+      tip.style.top = `${e.point.y}px`
+    })
+    map.on('mouseleave', 'polity-fill', () => {
+      hovered = ''
+      const none: never = ['==', ['get', 'polity'], ''] as never
+      map.setFilter('polity-hover', none)
+      map.setFilter('polity-hover-glow', none)
+      if (tipRef.current) tipRef.current.style.display = 'none'
+    })
+    map.on('movestart', () => tipRef.current && (tipRef.current.style.display = 'none'))
     // Đồng bộ camera giữa hai bản đồ khi so sánh
     syncGroup?.add(map)
     map.on('move', () => {
@@ -352,11 +392,13 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     if (!map || !ready) return
     const lines = map.getSource('story-lines') as GeoJSONSource | undefined
     const heads = map.getSource('story-heads') as GeoJSONSource | undefined
-    if (!lines || !heads) return
+    const dots = map.getSource('story-dots') as GeoJSONSource | undefined
+    if (!lines || !heads || !dots) return
     if (!story) {
       safely(() => {
         lines.setData({ type: 'FeatureCollection', features: [] })
         heads.setData({ type: 'FeatureCollection', features: [] })
+        dots.setData({ type: 'FeatureCollection', features: [] })
       })
       return
     }
@@ -384,12 +426,33 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       heads.setData({ type: 'FeatureCollection', features: H })
     }
     let raf = 0
+    let lastDots = 0
     const t0 = performance.now() + 500 // chờ camera bay tới
+    // "quân" chạy liên tục dọc các mũi tên của bước hiện tại
+    const moving = cur.filter((a) => !a.line)
+    const drawDots = (now: number) => {
+      const D: GeoJSON.Feature[] = []
+      for (const a of moving) {
+        const n = a.navy ? 2 : 3
+        for (let k = 0; k < n; k++) {
+          const ph = ((now - t0) / (a.retreat ? 2600 : 1900) + k / n) % 1
+          const p = slicePath(a.path, ph * f)
+          const fade = Math.min(1, ph * 6, (1 - ph) * 6)
+          D.push({ type: 'Feature', properties: { color: color(a), o: f < 0.25 ? 0 : fade }, geometry: { type: 'Point', coordinates: p[p.length - 1] } })
+        }
+      }
+      dots.setData({ type: 'FeatureCollection', features: D })
+    }
     const tick = (now: number) => {
+      const done = f >= 1
       f = Math.max(0, Math.min(1, (now - t0) / 1700))
       f = 1 - Math.pow(1 - f, 2.2)
-      safely(draw, 0)
-      if (now - t0 < 1700) raf = requestAnimationFrame(tick)
+      if (!done) safely(draw, 0)
+      if (moving.length && now - lastDots > 33) {
+        lastDots = now
+        safely(() => drawDots(now), 0)
+      }
+      if (now - t0 < 1700 || moving.length) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
     const onZoom = () => !raf || f >= 1 ? safely(draw, 0) : undefined
@@ -583,6 +646,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
   return (
     <div className="absolute inset-0 isolate">
       <div ref={box} className="h-full w-full" />
+      <div ref={tipRef} className="map-tip" style={{ display: 'none' }} />
       {items.map((it) => (slots[it.id] ? createPortal(it.node, slots[it.id], it.id) : null))}
     </div>
   )

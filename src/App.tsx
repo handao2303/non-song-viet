@@ -10,6 +10,7 @@ import TTViewer from './components/TTViewer'
 import { StoryPicker, StoryPlayer } from './components/Story'
 import IslandsPanel from './components/Islands'
 import CompareBar from './components/Compare'
+import { PaperOverlay, PeriodStamp, Splash } from './components/Atmosphere'
 import { STORIES } from './data/stories'
 import type { Map as MLMap } from 'maplibre-gl'
 import { areaSeries, loadGeo, territoryAt, type GeoData } from './lib/geo'
@@ -48,8 +49,11 @@ export default function App() {
   const story = useMemo(() => STORIES.find((s) => s.id === url.story) ?? null, [url.story])
   const storyState = useMemo(() => (story ? { s: story, step: Math.min(step, story.steps.length - 1) } : null), [story, step])
 
+  const [minWait, setMinWait] = useState(true)
   useEffect(() => {
     loadGeo().then(setGeo).catch((e) => setErr(String(e)))
+    const t = setTimeout(() => setMinWait(false), 2300) // đủ thời gian cho màn trống đồng
+    return () => clearTimeout(t)
   }, [])
 
   useEffect(() => {
@@ -180,15 +184,14 @@ export default function App() {
   if (err) return <div className="grid h-full place-items-center p-6 text-center">⚠ {err}</div>
   if (!geo || !terr)
     return (
-      <div className="grid h-full place-items-center">
-        <div className="text-center">
-          <div className="logo mx-auto mb-3 h-14 w-14 animate-pulse text-3xl"></div>
-          <div className="font-serif text-lg">{tr(lang, 'appName')}</div>
-        </div>
-      </div>
+      <>
+        {null}
+        <Splash leaving={false} lang={lang} />
+      </>
     )
 
   return (
+    <>
     <main className="relative h-full w-full overflow-hidden">
       <MapView
         geo={geo}
@@ -243,6 +246,8 @@ export default function App() {
           />
         </>
       )}
+      <PaperOverlay />
+      <PeriodStamp year={year} lang={lang} quiet={cmp !== null} />
       <Header
         lang={lang}
         layers={layers}
@@ -310,7 +315,9 @@ export default function App() {
       </div>
       {ttOpen && <TTViewer id={ttOpen.id} src={ttOpen.src} lang={lang} onClose={closeTT} />}
       {picker && <StoryPicker lang={lang} initial={picker} onPick={openStory} onClose={() => setPicker(null)} />}
-      {guide && <Guide lang={lang} onClose={() => setGuide(false)} onTour={startTour} />}
+      {guide && !minWait && <Guide lang={lang} onClose={() => setGuide(false)} onTour={startTour} />}
     </main>
+    <Splash leaving={!minWait} lang={lang} />
+    </>
   )
 }
