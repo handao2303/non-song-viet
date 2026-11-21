@@ -5,7 +5,7 @@ import { useId } from 'react'
  * chỉ gợi đặc điểm trang phục từng thời: mũ trụ, mũ xung thiên, mũ cánh chuồn, áo giáp, áo kaki…
  */
 
-type Hat = 'queen' | 'warrior-queen' | 'helmet' | 'crown' | 'official' | 'hcm' | 'general' | 'turban' | 'khanvan'
+type Hat = 'queen' | 'warrior-queen' | 'helmet' | 'crown' | 'official' | 'hcm' | 'general' | 'turban' | 'khanvan' | 'mien' | 'khanxep'
 type Beard = 'none' | 'mustache' | 'short' | 'long' | 'goatee-white' | 'full'
 
 interface Look {
@@ -32,6 +32,12 @@ export const LOOKS: Record<string, Look> = {
   'p-nguyentrai': { hat: 'official', beard: 'long', robe: '#2e4a6b', trim: '#c9a24a', bg: '#d8e0ea' },
   'p-quangtrung': { hat: 'turban', beard: 'full', robe: '#a3261b', trim: '#e0b04a', bg: '#f0d3c8', armor: true },
   'p-gialong': { hat: 'khanvan', beard: 'goatee-white', robe: '#d6a51c', trim: '#2e4a6b', bg: '#efe2c2', hair: '#3a3530' },
+  'p-lynamde': { hat: 'mien', beard: 'mustache', robe: '#9a2c1f', trim: '#e0b04a', bg: '#f1d6c8' },
+  'p-dinhbolinh': { hat: 'mien', beard: 'short', robe: '#3d3a6b', trim: '#d6a51c', bg: '#dcdbea' },
+  'p-lehoan': { hat: 'helmet', beard: 'full', robe: '#5b3a22', trim: '#d6a51c', bg: '#e6dcc8', armor: true },
+  'p-lethanhtong': { hat: 'crown', beard: 'short', robe: '#b8352a', trim: '#e0b04a', bg: '#f3d8c8' },
+  'p-nguyenhoang': { hat: 'official', beard: 'long', robe: '#6b2a4a', trim: '#d6a51c', bg: '#ead6de', hair: '#5a534c' },
+  'p-phanboichau': { hat: 'khanxep', beard: 'goatee-white', robe: '#1f1c1a', trim: '#5a524a', bg: '#e4ded2', hair: '#2a2622' },
   'p-hochiminh': { hat: 'hcm', beard: 'goatee-white', robe: '#b9a57a', trim: '#8e7c55', bg: '#e6e0cf', hair: '#d9d4cb' },
   'p-vonguyengiap': { hat: 'general', beard: 'none', robe: '#5d6b3f', trim: '#c0392b', bg: '#dfe3d3' },
 }
@@ -129,8 +135,8 @@ function Figure({ look, uid }: { look: Look; uid: string }) {
       )}
       {look.beard === 'goatee-white' && (
         <>
-          <path d="M44 56.2 Q47 54.5 50 55.6 Q53 54.5 56 56.2 Q53 55.8 50 56.7 Q47 55.8 44 56.2 Z" fill={look.hat === 'hcm' ? '#e9e5dd' : hair} />
-          <path d="M47 61 Q48 70 50 75 Q52 70 53 61 Q50 62.4 47 61 Z" fill={look.hat === 'hcm' ? '#ece8e1' : hair} />
+          <path d="M44 56.2 Q47 54.5 50 55.6 Q53 54.5 56 56.2 Q53 55.8 50 56.7 Q47 55.8 44 56.2 Z" fill={look.hat === 'hcm' || look.hat === 'khanxep' ? '#e9e5dd' : hair} />
+          <path d="M47 61 Q48 70 50 75 Q52 70 53 61 Q50 62.4 47 61 Z" fill={look.hat === 'hcm' || look.hat === 'khanxep' ? '#ece8e1' : hair} />
         </>
       )}
       {/* mũ / tóc phía trước */}
@@ -218,6 +224,32 @@ function Hat({ look, hair }: { look: Look; hair: string }) {
           <path d="M35 30.5 C43 25 57 25 65 30.5" fill="none" stroke="#a87b14" strokeWidth="1.1" />
           <path d="M39 26 C45 22.5 55 22.5 61 26" fill="none" stroke="#a87b14" strokeWidth="1.1" />
           <path d="M46 41 L50 36 L54 41" fill="none" stroke="#a87b14" strokeWidth="1" />
+        </g>
+      )
+    case 'mien':
+      // mũ miện: tấm bình thiên phía trên, chuỗi ngọc rủ trước trán
+      return (
+        <g>
+          <path d="M34 41 C33.5 27 66.5 27 66 41 Z" fill="#1d1a17" />
+          <rect x="33" y="37" width="34" height="4" rx="1" fill="#d6a51c" />
+          <path d="M27 24 L73 24 L71 19 L29 19 Z" fill="#1d1a17" stroke="#d6a51c" strokeWidth=".8" />
+          {[32, 38, 44, 50, 56, 62, 68].map((x) => (
+            <g key={x}>
+              <line x1={x} y1="24" x2={x} y2="31" stroke="#d6a51c" strokeWidth=".6" />
+              <circle cx={x} cy="29" r="1" fill="#c0392b" />
+              <circle cx={x} cy="32" r="1" fill="#e0b04a" />
+            </g>
+          ))}
+        </g>
+      )
+    case 'khanxep':
+      // khăn xếp đen của nhà nho cuối thế kỷ XIX
+      return (
+        <g>
+          <path d="M32 42 C30 28 70 28 68 42 C62 38 38 38 32 42 Z" fill="#1d1a17" />
+          <path d="M33 38.5 C40 34 60 34 67 38.5" fill="none" stroke="#4a433b" strokeWidth="1" />
+          <path d="M34 35 C41 30.5 59 30.5 66 35" fill="none" stroke="#4a433b" strokeWidth="1" />
+          <path d="M37 31.5 C43 28 57 28 63 31.5" fill="none" stroke="#4a433b" strokeWidth="1" />
         </g>
       )
     case 'hcm':

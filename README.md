@@ -11,7 +11,7 @@ Bản đồ tương tác lãnh thổ, triều đại, kinh đô và sự kiện 
 - **~95 sự kiện** có toạ độ, **~30 kinh đô / trị sở**, tìm kiếm không dấu (⌘K)
 - **Hành trình Nam tiến**: tour tự động 1069 → 1802
 - **Diễn biến trận đánh**: mũi tên tiến quân chạy trên bản đồ theo từng mốc — Bạch Đằng 938, Như Nguyệt 1076, Bạch Đằng 1288, Chi Lăng – Xương Giang 1427, Ngọc Hồi – Đống Đa 1789, Điện Biên Phủ 1954
-- **Hành trình nhân vật**: 12 nhân vật (Hai Bà Trưng, Ngô Quyền, Lý Thường Kiệt, Trần Hưng Đạo, Lê Lợi, Nguyễn Trãi, Quang Trung, Hồ Chí Minh…)
+- **Hành trình nhân vật**: 18 nhân vật có chân dung minh hoạ (Hai Bà Trưng, Lý Nam Đế, Ngô Quyền, Đinh Bộ Lĩnh, Lê Hoàn, Trần Hưng Đạo, Lê Thánh Tông, Nguyễn Hoàng, Quang Trung, Phan Bội Châu, Hồ Chí Minh…)
 - **Đọc nguyên văn có phiên âm Hán Việt**: rê chuột / chạm vào từng chữ để xem âm và nghĩa, bật "âm trên chữ", dòng phiên âm đầy đủ
 - **Hoàng Sa – Trường Sa**: lớp quần đảo và các mốc sử liệu chủ quyền (1686 → 2025)
 - **Tên gọi qua các thời**: bấm vào một tỉnh để xem Long Biên → Tống Bình → Đại La → Thăng Long → Hà Nội…

@@ -590,7 +590,55 @@ const people: Story[] = [
     [1975, 106.695, 10.777, 'Đại thắng mùa Xuân', 'Spring victory', 'Bộ trưởng Quốc phòng trong Tổng tiến công mùa Xuân 1975.', 'Defence minister during the 1975 Spring Offensive.'],
     [2013, 106.47, 17.73, 'Vũng Chùa', 'Vũng Chùa', 'Mất ngày 4/10/2013 ở tuổi 102, an táng ở Vũng Chùa – Đảo Yến.', 'Died aged 102; buried at Vũng Chùa.'],
   ]),
+  life('p-lynamde', '賁', [503, 548], 'Lý Nam Đế', 'Lý Nam Đế', 'Lý Bí — người lập nước Vạn Xuân', 'Lý Bí — founder of Vạn Xuân', [
+    [503, 105.47, 21.13, 'Quê Thái Bình', 'Born in Thái Bình', 'Sinh ở huyện Thái Bình, Giao Châu (vùng Sơn Tây ngày nay, theo nhiều thuyết), dòng dõi hào trưởng.', 'Born to a local chief’s family in Thái Bình county, Giao Châu (around today’s Sơn Tây).'],
+    [541, 105.89, 21.05, 'Khởi nghĩa, đuổi Tiêu Tư', 'Rising against Xiao Zi', 'Liên kết hào kiệt các châu nổi dậy; thứ sử Tiêu Tư bỏ thành Long Biên chạy về Quảng Châu.', 'Allied with local leaders and rose up; governor Xiao Zi fled Long Biên for Guangzhou.'],
+    [544, 105.836, 21.048, 'Xưng Nam Việt Đế', 'Emperor of Nam Việt', 'Lên ngôi hoàng đế, đặt quốc hiệu Vạn Xuân, dựng chùa Khai Quốc (nay là chùa Trấn Quốc).', 'Proclaimed emperor of Vạn Xuân and founded Khai Quốc pagoda (today Trấn Quốc).'],
+    [545, 105.35, 21.32, 'Chống quân Lương', 'Against the Liang', 'Trần Bá Tiên đem quân Lương sang; Lý Nam Đế thua ở Chu Diên, Gia Ninh, lui về Tân Xương.', 'Chen Baxian’s Liang army defeated him at Chu Diên and Gia Ninh; he fell back to Tân Xương.'],
+    [548, 105.25, 21.3, 'Động Khuất Lão', 'Khuất Lão cave', 'Giao binh quyền cho Triệu Quang Phục, rồi mất ở động Khuất Lão (Phú Thọ).', 'He handed command to Triệu Quang Phục and died at Khuất Lão (Phú Thọ).'],
+  ]),
+  life('p-dinhbolinh', '丁', [924, 979], 'Đinh Bộ Lĩnh', 'Đinh Bộ Lĩnh', 'Đinh Tiên Hoàng — dẹp loạn 12 sứ quân', 'Đinh Tiên Hoàng — ended the Twelve Warlords', [
+    [924, 105.905, 20.285, 'Hoa Lư', 'Hoa Lư', 'Sinh ở động Hoa Lư; thuở nhỏ chăn trâu, lấy bông lau làm cờ tập trận.', 'Born at Hoa Lư; as a buffalo boy he drilled playmates with reed-flower banners.'],
+    [951, 106.33, 20.45, 'Theo sứ quân Trần Lãm', 'Joins Trần Lãm', 'Cùng con là Đinh Liễn đến nương nhờ sứ quân Trần Lãm ở Bố Hải Khẩu (Thái Bình).', 'Joined the warlord Trần Lãm at Bố Hải Khẩu (Thái Bình).'],
+    [967, 105.85, 21.03, 'Dẹp 12 sứ quân', 'Ends the warlords', 'Lần lượt đánh dẹp các sứ quân, được tôn là Vạn Thắng Vương.', 'Defeated the warlords one by one and was hailed as King of Ten Thousand Victories.'],
+    [968, 105.905, 20.285, 'Lên ngôi ở Hoa Lư', 'Crowned at Hoa Lư', 'Xưng Đại Thắng Minh Hoàng Đế, đặt quốc hiệu Đại Cồ Việt, đóng đô ở Hoa Lư.', 'Crowned emperor of Đại Cồ Việt with Hoa Lư as capital.'],
+    [979, 105.905, 20.285, 'Mất', 'Death', 'Bị Đỗ Thích ám hại cùng con trưởng Đinh Liễn.', 'Assassinated by Đỗ Thích together with his son Đinh Liễn.'],
+  ]),
+  life('p-lehoan', '桓', [941, 1005], 'Lê Hoàn', 'Lê Hoàn', 'Lê Đại Hành — phá Tống, bình Chiêm', 'Lê Đại Hành — beat the Song, struck Champa', [
+    [941, 105.5, 19.9, 'Ái Châu', 'Ái Châu', 'Người Ái Châu (Thanh Hoá) theo Toàn thư; mồ côi sớm, được quan sát họ Lê nuôi dạy.', 'From Ái Châu (Thanh Hóa) per the Toàn thư; orphaned and raised by an official named Lê.'],
+    [971, 105.905, 20.285, 'Thập đạo tướng quân', 'Commander of the Ten Circuits', 'Được Đinh Tiên Hoàng giao chỉ huy toàn quân ở Hoa Lư.', 'Put in command of the whole army by Đinh Tiên Hoàng.'],
+    [980, 105.905, 20.285, 'Lên ngôi', 'Takes the throne', 'Quân Tống sắp sang, triều thần và Thái hậu Dương Vân Nga trao áo long cổn, mở đầu nhà Tiền Lê.', 'With the Song approaching, the court and Empress Dowager Dương Vân Nga made him emperor.'],
+    [981, 106.6, 21.66, 'Phá Tống', 'Defeats the Song', 'Đánh tan quân Tống ở Chi Lăng và trên sông Bạch Đằng, chém tướng Hầu Nhân Bảo.', 'Routed the Song at Chi Lăng and on the Bạch Đằng, killing Hou Renbao.'],
+    [982, 108.25, 15.69, 'Đánh Chiêm Thành', 'Strikes Champa', 'Phá kinh đô Indrapura (Quảng Nam) của Chiêm Thành.', 'Sacked the Cham capital of Indrapura (Quảng Nam).'],
+    [1005, 105.905, 20.285, 'Mất ở Hoa Lư', 'Dies at Hoa Lư', 'Mất ở điện Trường Xuân, ở ngôi 24 năm.', 'Died after 24 years on the throne.'],
+  ]),
+  life('p-lethanhtong', '灝', [1442, 1497], 'Lê Thánh Tông', 'Lê Thánh Tông', 'Vua Hồng Đức — mở rộng bờ cõi, định luật pháp', 'The Hồng Đức emperor — law-giver and conqueror', [
+    [1442, 105.84, 21.035, 'Sinh ở Thăng Long', 'Born in Thăng Long', 'Con thứ tư vua Lê Thái Tông và bà Ngô Thị Ngọc Dao, sinh ở chùa Huy Văn.', 'Fourth son of Lê Thái Tông and Ngô Thị Ngọc Dao, born at Huy Văn temple.'],
+    [1460, 105.84, 21.035, 'Lên ngôi', 'Takes the throne', 'Được các đại thần đón lên ngôi sau khi dẹp loạn Nghi Dân.', 'Placed on the throne after ministers overthrew the usurper Nghi Dân.'],
+    [1466, 105.84, 21.035, 'Định 12 đạo thừa tuyên', 'Twelve provinces', 'Cải cách hành chính, chia cả nước thành các đạo thừa tuyên; năm 1490 vẽ bản đồ Hồng Đức.', 'Reorganised the realm into provinces; the Hồng Đức atlas followed in 1490.'],
+    [1471, 109.11, 13.89, 'Hạ thành Vijaya', 'Takes Vijaya', 'Thân chinh đánh Chiêm Thành, lập thừa tuyên Quảng Nam.', 'Led the campaign against Champa and created Quảng Nam province.'],
+    [1483, 105.84, 21.035, 'Luật Hồng Đức', 'The Hồng Đức Code', 'Ban hành Quốc triều hình luật, bảo vệ quyền lợi phụ nữ và người yếu thế.', 'Promulgated the national penal code, notable for protecting women’s rights.'],
+    [1497, 105.4, 19.93, 'Chiêu Lăng', 'Chiêu Lăng', 'Mất năm 1497, táng ở Chiêu Lăng, Lam Sơn.', 'Died 1497, buried at Chiêu Lăng in Lam Sơn.'],
+  ]),
+  life('p-nguyenhoang', '潢', [1525, 1613], 'Nguyễn Hoàng', 'Nguyễn Hoàng', 'Chúa Tiên — mở nghiệp Đàng Trong', 'Lord Tiên — founder of the southern realm', [
+    [1525, 105.85, 20.03, 'Gia Miêu', 'Gia Miêu', 'Con Nguyễn Kim, sinh ở Gia Miêu (Hà Trung, Thanh Hoá).', 'Son of Nguyễn Kim, born at Gia Miêu (Thanh Hóa).'],
+    [1558, 107.15, 16.78, 'Vào trấn Thuận Hoá', 'Governor of Thuận Hóa', 'Theo lời khuyên “Hoành Sơn nhất đái”, xin vào trấn thủ Thuận Hoá, đóng dinh ở Ái Tử.', 'Following the oracle of the Hoành Sơn range, he took the Thuận Hóa post, based at Ái Tử.'],
+    [1593, 105.84, 21.035, 'Ra Bắc đánh Mạc', 'Fights the Mạc', 'Ra Thăng Long giúp Trịnh Tùng đánh dư đảng họ Mạc.', 'Went north to help Trịnh Tùng against the remaining Mạc.'],
+    [1600, 107.15, 16.78, 'Trở về Thuận Hoá', 'Back to Thuận Hóa', 'Đốt doanh trại, theo đường biển về Nam — từ đây Đàng Trong tách riêng.', 'Burned his camp and slipped back south by sea — the start of a separate realm.'],
+    [1611, 109.3, 13.1, 'Lập phủ Phú Yên', 'Founds Phú Yên', 'Sai Văn Phong lấy đất đến đèo Cả, lập phủ Phú Yên.', 'Sent Văn Phong to take the land to the Cả pass, creating Phú Yên.'],
+    [1613, 107.15, 16.78, 'Mất', 'Death', 'Mất năm 1613, thọ 89 tuổi; dặn con giữ vững đất Thuận Quảng.', 'Died aged 89, urging his son to hold Thuận–Quảng.'],
+  ]),
+  life('p-phanboichau', '珠', [1867, 1940], 'Phan Bội Châu', 'Phan Bội Châu', 'Nhà yêu nước, khởi xướng phong trào Đông Du', 'Patriot who launched the Đông Du movement', [
+    [1867, 105.5, 18.7, 'Nam Đàn', 'Nam Đàn', 'Sinh ở huyện Nam Đàn (Nghệ An), nổi tiếng hay chữ từ nhỏ.', 'Born in Nam Đàn (Nghệ An), a precocious scholar.'],
+    [1904, 108.3, 15.75, 'Lập Duy Tân hội', 'Founds the Duy Tân Society', 'Cùng Nguyễn Hàm, Kỳ Ngoại hầu Cường Để lập hội ở Quảng Nam, chủ trương giành độc lập.', 'With Nguyễn Hàm and Prince Cường Để he founded a society for independence in Quảng Nam.'],
+    [1905, 106.68, 20.86, 'Xuất dương — Đông Du', 'Abroad — Đông Du', 'Bí mật xuất dương sang Nhật, kêu gọi thanh niên sang học (phong trào Đông Du).', 'Left secretly for Japan and called young Vietnamese to study there.'],
+    [1912, 113.26, 23.13, 'Việt Nam Quang phục hội', 'Restoration League', 'Ở Quảng Châu lập Việt Nam Quang phục hội, chủ trương lập nước dân chủ.', 'Founded the Vietnam Restoration League in Guangzhou.'],
+    [1925, 121.47, 31.23, 'Bị bắt ở Thượng Hải', 'Arrested in Shanghai', 'Mật thám Pháp bắt cóc ở Thượng Hải, đưa về nước xử án; dư luận phản đối mạnh.', 'Kidnapped by French agents in Shanghai and tried at home amid public outcry.'],
+    [1940, 107.59, 16.45, 'Bến Ngự, Huế', 'Bến Ngự, Huế', 'Bị giam lỏng ở Bến Ngự (Huế) đến khi mất năm 1940.', 'Kept under house arrest at Bến Ngự until his death in 1940.'],
+  ]),
 ]
+
+people.sort((a, b) => a.life![0] - b.life![0])
 
 export const STORIES: Story[] = [...battles, ...people]
 export const BATTLES = battles
