@@ -4,16 +4,18 @@ import type { HistEvent, Lang } from '../data/types'
 import { PERIODS } from '../data/periods'
 import { EVENTS } from '../data/events'
 import { CAPITALS } from '../data/capitals'
+import { STORIES } from '../data/stories'
 import { fmtSpan, fmtYear, fold } from '../lib/time'
 import { pick, tr } from '../lib/i18n'
 
 export interface SearchHit {
-  kind: 'period' | 'event' | 'place' | 'province'
+  kind: 'period' | 'event' | 'place' | 'province' | 'story'
   label: string
   sub: string
   year?: number
   coord?: [number, number]
   event?: HistEvent
+  story?: string
 }
 
 interface Props {
@@ -25,9 +27,12 @@ interface Props {
   onPick: (h: SearchHit) => void
   onTour: () => void
   onHelp: () => void
+  onStories: () => void
+  onCompare: () => void
+  comparing: boolean
 }
 
-export default function Header({ lang, layers, provinces, onLang, onLayers, onPick, onTour, onHelp }: Props) {
+export default function Header({ lang, layers, provinces, onLang, onLayers, onPick, onTour, onHelp, onStories, onCompare, comparing }: Props) {
   const [menu, setMenu] = useState(false)
   const [q, setQ] = useState('')
   const [focus, setFocus] = useState(false)
@@ -51,6 +56,8 @@ export default function Header({ lang, layers, provinces, onLang, onLayers, onPi
       out.push({ kind: 'period', label: pick(lang, p.name), sub: `${fmtSpan(p.start, p.end, lang)}${p.founder ? ' · ' + pick(lang, p.founder) : ''}${p.rulers ? ' ' + p.rulers.join(' ') : ''}`, year: p.start })
     for (const e of EVENTS) out.push({ kind: 'event', label: pick(lang, e.title), sub: `${fmtYear(e.year, lang, true)} · ${pick(lang, e.desc)}`, year: e.year, coord: e.coord, event: e })
     for (const c of CAPITALS) out.push({ kind: 'place', label: pick(lang, c.name), sub: c.spans.map(([a, b]) => fmtSpan(a, b, lang)).join(', '), year: c.spans[0][0], coord: c.coord })
+    for (const st of STORIES)
+      out.push({ kind: 'story', label: pick(lang, st.title), sub: `${st.kind === 'battle' ? '⚔' : '👤'} ${pick(lang, st.sub)}`, year: st.year, story: st.id })
     for (const p of provinces) out.push({ kind: 'province', label: p.name, sub: tr(lang, 'province'), coord: p.center })
     return out
   }, [lang, provinces])
@@ -64,7 +71,7 @@ export default function Header({ lang, layers, provinces, onLang, onLayers, onPi
         const L = fold(h.label)
         const S = fold(h.sub)
         if (!words.every((w) => L.includes(w) || S.includes(w))) return null
-        const score = (L.startsWith(s) ? 0 : L.includes(s) ? 1 : 2) + (h.kind === 'period' ? -0.5 : 0)
+        const score = (L.startsWith(s) ? 0 : L.includes(s) ? 1 : 2) + (h.kind === 'period' ? -0.5 : h.kind === 'story' ? -0.3 : 0)
         return { h, score }
       })
       .filter(Boolean)
@@ -79,7 +86,7 @@ export default function Header({ lang, layers, provinces, onLang, onLayers, onPi
     input.current?.blur()
   }
 
-  const KIND: Record<SearchHit['kind'], string> = { period: tr(lang, 'period'), event: tr(lang, 'event'), place: tr(lang, 'place'), province: tr(lang, 'province') }
+  const KIND: Record<SearchHit['kind'], string> = { period: tr(lang, 'period'), event: tr(lang, 'event'), place: tr(lang, 'place'), province: tr(lang, 'province'), story: lang === 'vi' ? 'Câu chuyện' : 'Story' }
 
   return (
     <header className="pointer-events-none absolute inset-x-3 top-3 z-30 flex items-center gap-2">
@@ -129,6 +136,19 @@ export default function Header({ lang, layers, provinces, onLang, onLayers, onPi
 
       <button className="glass pointer-events-auto h-11 rounded-xl px-3 text-[13px] font-medium hover:bg-white/60 max-sm:ml-auto" onClick={onTour} title={tr(lang, 'nanTien')}>
         🧭 <span className="max-lg:hidden">{tr(lang, "nanTien")}</span>
+      </button>
+
+      <button className="glass pointer-events-auto h-11 rounded-xl px-3 text-[13px] font-medium hover:bg-white/60" onClick={onStories} title={lang === 'vi' ? 'Trận đánh & nhân vật' : 'Battles & people'}>
+        ⚔ <span className="max-lg:hidden">{lang === 'vi' ? 'Trận đánh · Nhân vật' : 'Battles · People'}</span>
+      </button>
+
+      <button
+        className={`glass pointer-events-auto h-11 rounded-xl px-3 text-[13px] font-medium hover:bg-white/60 max-sm:hidden ${comparing ? 'ring-2 ring-[#9c3a26]' : ''}`}
+        onClick={onCompare}
+        aria-pressed={comparing}
+        title={lang === 'vi' ? 'So sánh hai năm' : 'Compare two years'}
+      >
+        ◧ <span className="max-xl:hidden">{lang === 'vi' ? 'So sánh' : 'Compare'}</span>
       </button>
 
       <div className="pointer-events-auto relative">

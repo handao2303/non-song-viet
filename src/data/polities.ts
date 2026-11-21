@@ -60,7 +60,7 @@ export const POLITIES: Record<string, Polity> = {
   nguyenlord: { id: 'nguyenlord', kind: 'viet', color: '#3f8290', dynasty: t('chúa Nguyễn', 'Nguyễn lords'), name: fixed('Đàng Trong', 'Đàng Trong (Cochinchina)') },
   tayson: { id: 'tayson', kind: 'viet', color: '#c23b30', dynasty: t('nhà Tây Sơn', 'Tây Sơn dynasty'), name: fixed('Tây Sơn', 'Tây Sơn') },
   nguyenanh: { id: 'nguyenanh', kind: 'viet', color: '#2f6f80', dynasty: t('Nguyễn Ánh', 'Nguyễn Ánh'), name: fixed('Gia Định (Nguyễn Ánh)', 'Gia Định (Nguyễn Ánh)') },
-  nguyen: { id: 'nguyen', kind: 'viet', color: '#d6a51c', dynasty: t('nhà Nguyễn', 'Nguyễn dynasty'), name: (y) => (y < 1804 ? t('Việt Nam', 'Việt Nam') : y < 1839 ? t('Việt Nam', 'Việt Nam') : t('Đại Nam', 'Đại Nam')) },
+  nguyen: { id: 'nguyen', kind: 'viet', color: '#d6a51c', dynasty: t('nhà Nguyễn', 'Nguyễn dynasty'), name: (y) => (y < 1804 ? t('Việt Nam', 'Việt Nam') : y < 1838 ? t('Việt Nam', 'Việt Nam') : t('Đại Nam', 'Đại Nam')) },
   cochin: { id: 'cochin', kind: 'colonial', color: '#5b6d92', dynasty: t('Pháp thuộc', 'French colony'), name: fixed('Nam Kỳ (thuộc địa Pháp)', 'Cochinchina (French colony)') },
   annam: { id: 'annam', kind: 'protectorate', color: '#c6a65a', dynasty: t('nhà Nguyễn · bảo hộ Pháp', 'Nguyễn under French protectorate'), name: fixed('Trung Kỳ (Annam)', 'Annam') },
   tonkin: { id: 'tonkin', kind: 'protectorate', color: '#8797b8', dynasty: t('Bảo hộ Pháp', 'French protectorate'), name: fixed('Bắc Kỳ (Tonkin)', 'Tonkin') },

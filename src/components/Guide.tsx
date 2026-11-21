@@ -14,7 +14,9 @@ export function guideSeen() {
 const STEPS: { icon: string; vi: [string, string]; en: [string, string] }[] = [
   { icon: '⟷', vi: ['Kéo dòng thời gian', 'Kéo thanh dưới cùng hoặc bấm ▶ để xem lãnh thổ đổi qua từng năm. Phím ← → để đi từng năm.'], en: ['Drag the timeline', 'Drag the bar at the bottom or press ▶ to watch borders change. Use ← → to step year by year.'] },
   { icon: '⌖', vi: ['Bấm vào bản đồ', 'Bấm bất kỳ đâu để xem vùng đất ấy thuộc về ai qua mọi thời kỳ.'], en: ['Click the map', 'Click anywhere to see who ruled that place across history.'] },
-  { icon: '史', vi: ['Đọc sử gốc', 'Bấm một sự kiện để xem trích dẫn nguyên văn Đại Việt sử ký toàn thư.'], en: ['Read the source', 'Click an event to see the original text of the Đại Việt sử ký toàn thư.'] },
+  { icon: '史', vi: ['Đọc sử gốc', 'Bấm một sự kiện để đọc nguyên văn Toàn thư hoặc Đại Nam thực lục, có phiên âm Hán Việt từng chữ.'], en: ['Read the source', 'Click an event to read the original Toàn thư or Đại Nam thực lục, with a Sino-Vietnamese reading for every character.'] },
+  { icon: '⚔', vi: ['Xem trận đánh, nhân vật', 'Nút “Trận đánh · Nhân vật”: mũi tên tiến quân chạy trên bản đồ, hoặc đi theo cuộc đời Ngô Quyền, Trần Hưng Đạo, Quang Trung…'], en: ['Battles & people', 'Watch armies move on the map, or follow the lives of Ngô Quyền, Trần Hưng Đạo, Quang Trung…'] },
+  { icon: '◧', vi: ['So sánh hai năm', 'Nút “So sánh”: kéo vạch giữa màn hình để đặt hai thời kỳ cạnh nhau, ví dụ 1069 và 1802.'], en: ['Compare two years', 'Drag the divider to put two eras side by side, e.g. 1069 and 1802.'] },
   { icon: '◐', vi: ['Đọc màu bản đồ', 'Mỗi màu là một thế lực. Rê chuột vào “Thế lực trên bản đồ” để làm nổi vùng ấy; vùng xanh nét đứt là đất vừa mở cõi.'], en: ['Read the colours', 'Each colour is a power. Hover “Powers on the map” to highlight one; green dashed areas are newly gained lands.'] },
 ]
 

@@ -7,6 +7,11 @@ import { PeriodPanel, TracePanel } from './components/Panels'
 import NowCard from './components/NowCard'
 import Guide, { guideSeen } from './components/Guide'
 import TTViewer from './components/TTViewer'
+import { StoryPicker, StoryPlayer } from './components/Story'
+import IslandsPanel from './components/Islands'
+import CompareBar from './components/Compare'
+import { STORIES } from './data/stories'
+import type { Map as MLMap } from 'maplibre-gl'
 import { areaSeries, loadGeo, territoryAt, type GeoData } from './lib/geo'
 import { traceAt } from './lib/trace'
 import { useUrlState } from './lib/url'
@@ -23,17 +28,25 @@ export default function App() {
   const [geo, setGeo] = useState<GeoData | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const [url, setUrl] = useUrlState()
-  const { year, lang, trace } = url
-  const [layers, setLayers] = useState<Layers>({ territories: true, capitals: true, events: true, rivers: true, relief: true, modern: false })
+  const { year, lang, trace, cmp } = url
+  const [layers, setLayers] = useState<Layers>({ territories: true, capitals: true, events: true, rivers: true, relief: true, modern: false, islands: true })
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
   const [fly, setFly] = useState<FlyTarget | null>(null)
   const [activeEvent, setActiveEvent] = useState<string | null>(null)
   const [focusPolity, setFocusPolity] = useState<string | null>(null)
   const [guide, setGuide] = useState(() => !guideSeen())
-  const [ttOpen, setTtOpen] = useState<string | null>(null)
-  const closeTT = useCallback(() => setTtOpen(null), [])
+  const [ttOpen, setTtOpenRaw] = useState<{ id: string; src: 'tt' | 'dn' } | null>(null)
+  const setTtOpen = useCallback((id: string, src: 'tt' | 'dn' = 'tt') => setTtOpenRaw({ id, src }), [])
+  const closeTT = useCallback(() => setTtOpenRaw(null), [])
   const tourTimer = useRef<number | null>(null)
+  const [picker, setPicker] = useState<'battle' | 'life' | null>(null)
+  const [step, setStep] = useState(0)
+  const [islands, setIslands] = useState(false)
+  const [split, setSplit] = useState(0.5)
+  const syncGroup = useRef(new Set<MLMap>()).current
+  const story = useMemo(() => STORIES.find((s) => s.id === url.story) ?? null, [url.story])
+  const storyState = useMemo(() => (story ? { s: story, step: Math.min(step, story.steps.length - 1) } : null), [story, step])
 
   useEffect(() => {
     loadGeo().then(setGeo).catch((e) => setErr(String(e)))
@@ -84,6 +97,7 @@ export default function App() {
       else if (e.key === 'PageUp' || e.key === '[') setYear([...STOPS].reverse().find((s) => s < year) ?? year)
       else if (e.key === 'Escape') {
         if (!ttOpen) setUrl((s) => ({ ...s, trace: null }))
+        setIslands(false)
       }
       else return
       e.preventDefault()
@@ -100,6 +114,29 @@ export default function App() {
     },
     [setYear],
   )
+
+  // Đi tới từng bước của câu chuyện
+  useEffect(() => {
+    if (!story) return
+    const st = story.steps[Math.min(step, story.steps.length - 1)]
+    setYear(st.year ?? story.year)
+    const v = st.view ?? story.view
+    const narrow = window.innerWidth < 768
+    setFly({ center: v.center, zoom: v.zoom - (narrow ? 0.9 : 0) - (story.kind === 'life' ? 0.6 : 0), key: Date.now() })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [story, step])
+
+  const openStory = useCallback(
+    (id: string) => {
+      stopTour()
+      setPlaying(false)
+      setPicker(null)
+      setStep(0)
+      setUrl((s) => ({ ...s, story: id, trace: null, cmp: null }))
+    },
+    [setUrl],
+  )
+  const closeStory = useCallback(() => setUrl((s) => ({ ...s, story: null })), [setUrl])
 
   const startTour = () => {
     stopTour()
@@ -131,6 +168,7 @@ export default function App() {
 
   const onPick = (h: SearchHit) => {
     stopTour()
+    if (h.story) return openStory(h.story)
     if (h.event) return onEvent(h.event)
     if (h.year !== undefined) setYear(h.year)
     if (h.coord) {
@@ -161,12 +199,50 @@ export default function App() {
         fly={fly}
         activeEvent={activeEvent}
         focusPolity={focusPolity}
-        onTrace={(p) => setUrl((s) => ({ ...s, trace: p }))}
+        story={storyState}
+        syncGroup={syncGroup}
+        onIslands={() => {
+          setIslands(true)
+          setUrl((s) => ({ ...s, trace: null }))
+        }}
+        onTrace={(p) => {
+          setIslands(false)
+          setUrl((s) => ({ ...s, trace: p }))
+        }}
         onEvent={(e) => {
           stopTour()
           onEvent(e)
         }}
       />
+      {cmp !== null && (
+        <>
+          <div className="absolute inset-0 z-[1]" style={{ clipPath: `inset(0 0 0 ${split * 100}%)` }}>
+            <MapView
+              geo={geo}
+              year={cmp}
+              lang={lang}
+              layers={{ ...layers, events: false }}
+              trace={null}
+              fly={null}
+              activeEvent={null}
+              focusPolity={focusPolity}
+              compare
+              syncGroup={syncGroup}
+              onTrace={(p) => setUrl((s) => ({ ...s, trace: p }))}
+              onEvent={onEvent}
+            />
+          </div>
+          <CompareBar
+            split={split}
+            onSplit={setSplit}
+            left={year}
+            right={cmp}
+            lang={lang}
+            onRight={(y) => setUrl((s) => ({ ...s, cmp: y }))}
+            onClose={() => setUrl((s) => ({ ...s, cmp: null }))}
+          />
+        </>
+      )}
       <Header
         lang={lang}
         layers={layers}
@@ -176,8 +252,14 @@ export default function App() {
         onPick={onPick}
         onTour={startTour}
         onHelp={() => setGuide(true)}
+        onStories={() => setPicker('battle')}
+        comparing={cmp !== null}
+        onCompare={() => {
+          closeStory()
+          setUrl((s) => ({ ...s, cmp: s.cmp === null ? (s.year < 1700 ? 1802 : 1069) : null }))
+        }}
       />
-      <PeriodPanel
+      {!(story && window.innerWidth < 1100) && <PeriodPanel
         year={year}
         lang={lang}
         shapes={terr.shapes}
@@ -185,6 +267,7 @@ export default function App() {
         focusPolity={focusPolity}
         onFocusPolity={setFocusPolity}
         onOpenTT={setTtOpen}
+        onStory={openStory}
         onEvent={(e) => {
           stopTour()
           onEvent(e)
@@ -193,12 +276,14 @@ export default function App() {
           stopTour()
           setYear(y)
         }}
-      />
+      />}
+      {islands && !trace && <IslandsPanel lang={lang} year={year} onYear={setYear} onClose={() => setIslands(false)} />}
       {trace && traceRes && traceRes.kind !== 'sea' && (
         <TracePanel result={traceRes} coord={trace} year={year} lang={lang} onYear={setYear} onClose={() => setUrl((s) => ({ ...s, trace: null }))} />
       )}
-      <NowCard year={year} lang={lang} provinceIds={geo.ids} names={geo.names} />
-      {!trace && (
+      {!story && cmp === null && <NowCard year={year} lang={lang} provinceIds={geo.ids} names={geo.names} />}
+      {story && storyState && <StoryPlayer story={story} step={storyState.step} lang={lang} onStep={setStep} onClose={closeStory} />}
+      {!trace && !story && !islands && cmp === null && (
         <div className="hint glass max-xl:hidden">
           <span className="text-base">⌖</span> {tr(lang, 'traceHint')}
         </div>
@@ -223,7 +308,8 @@ export default function App() {
         />
         <p className="mt-1.5 px-1 text-[10.5px] text-ink/50 max-sm:hidden">{tr(lang, 'disclaimer')}</p>
       </div>
-      {ttOpen && <TTViewer id={ttOpen} lang={lang} onClose={closeTT} />}
+      {ttOpen && <TTViewer id={ttOpen.id} src={ttOpen.src} lang={lang} onClose={closeTT} />}
+      {picker && <StoryPicker lang={lang} initial={picker} onPick={openStory} onClose={() => setPicker(null)} />}
       {guide && <Guide lang={lang} onClose={() => setGuide(false)} onTour={startTour} />}
     </main>
   )

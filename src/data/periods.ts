@@ -195,10 +195,10 @@ export const PERIODS: Period[] = [
   },
   {
     id: 'nguyen', polity: 'nguyen', start: 1802, end: 1883,
-    name: t('Nhà Nguyễn (độc lập)', 'Nguyễn dynasty (independent)'), title: t('Việt Nam (1804) → Đại Nam (1839)', 'Việt Nam (1804) → Đại Nam (1839)'), founder: t('Gia Long (Nguyễn Ánh)', 'Gia Long'), capital: t('Phú Xuân (Huế)', 'Huế'),
+    name: t('Nhà Nguyễn (độc lập)', 'Nguyễn dynasty (independent)'), title: t('Việt Nam (1804) → Đại Nam (1838)', 'Việt Nam (1804) → Đại Nam (1838)'), founder: t('Gia Long (Nguyễn Ánh)', 'Gia Long'), capital: t('Phú Xuân (Huế)', 'Huế'),
     summary: t(
-      'Lãnh thổ trải dài từ Ải Nam Quan đến Mũi Cà Mau, quốc hiệu Việt Nam (1804) rồi Đại Nam (1839). Minh Mạng cải cách hành chính, lập 31 tỉnh. Pháp nổ súng ở Đà Nẵng (1858), chiếm Nam Kỳ (1862–1867).',
-      'The first state to span from the Chinese border to Cà Mau, named Việt Nam (1804) then Đại Nam (1839). Minh Mạng created 31 provinces. France attacked Đà Nẵng (1858) and took Cochinchina (1862–67).',
+      'Lãnh thổ trải dài từ Ải Nam Quan đến Mũi Cà Mau, quốc hiệu Việt Nam (1804) rồi Đại Nam (1838). Minh Mạng cải cách hành chính, lập 31 tỉnh. Pháp nổ súng ở Đà Nẵng (1858), chiếm Nam Kỳ (1862–1867).',
+      'The first state to span from the Chinese border to Cà Mau, named Việt Nam (1804) then Đại Nam (1838). Minh Mạng created 31 provinces. France attacked Đà Nẵng (1858) and took Cochinchina (1862–67).',
     ),
     rulers: ['Gia Long', 'Minh Mạng', 'Thiệu Trị', 'Tự Đức', 'Dục Đức', 'Hiệp Hòa', 'Kiến Phúc'],
   },

@@ -9,6 +9,9 @@ import type { TraceResult } from '../lib/trace'
 import { canChi, fmtSpan, fmtYear } from '../lib/time'
 import { TT, TT_ABSENT, TT_END, volName, volUrl } from '../data/toanthu'
 import { pick, tr } from '../lib/i18n'
+import { adminAt, adminNames } from '../data/adminNames'
+import { DN, DN_END, dnName } from '../data/thuclu'
+import { storyByEvent } from '../data/stories'
 
 /* ───────────── Thời kỳ hiện tại ───────────── */
 export function PeriodPanel({
@@ -21,6 +24,7 @@ export function PeriodPanel({
   focusPolity,
   onFocusPolity,
   onOpenTT,
+  onStory,
 }: {
   year: number
   lang: Lang
@@ -30,7 +34,8 @@ export function PeriodPanel({
   onYear: (y: number) => void
   focusPolity: string | null
   onFocusPolity: (p: string | null) => void
-  onOpenTT: (id: string) => void
+  onOpenTT: (id: string, src?: 'tt' | 'dn') => void
+  onStory: (id: string) => void
 }) {
   const p = periodAt(year)
   const [open, setOpen] = useState(() => window.innerWidth >= 768)
@@ -144,8 +149,13 @@ export function PeriodPanel({
                       <span className="block font-medium leading-snug">{pick(lang, e.title)}</span>
                       {active && <span className="mt-0.5 block text-[12.5px] leading-snug text-ink/75">{pick(lang, e.desc)}</span>}
                     </span>
-                    {TT[e.id] && <span className="tt-dot" title={tr(lang, 'toanthu')}>史</span>}
+                    {TT[e.id] ? <span className="tt-dot" title={tr(lang, 'toanthu')}>史</span> : DN[e.id] ? <span className="tt-dot dn" title="Đại Nam thực lục">錄</span> : null}
                   </button>
+                  {active && storyByEvent(e.id) && (
+                    <button className="story-cta" onClick={() => onStory(storyByEvent(e.id)!.id)}>
+                      ▶ {lang === 'vi' ? 'Xem diễn biến trận đánh trên bản đồ' : 'Replay the battle on the map'}
+                    </button>
+                  )}
                   {active && <Cite id={e.id} year={e.year} lang={lang} onOpen={onOpenTT} />}
                   </div>
                 )
@@ -159,25 +169,46 @@ export function PeriodPanel({
 }
 
 /* ───────────── Trích dẫn Đại Việt sử ký toàn thư ───────────── */
-function Cite({ id, year, lang, onOpen }: { id: string; year: number; lang: Lang; onOpen: (id: string) => void }) {
+function Cite({ id, year, lang, onOpen }: { id: string; year: number; lang: Lang; onOpen: (id: string, src?: 'tt' | 'dn') => void }) {
   const c = TT[id]
-  if (c)
-    return (
-      <button className="tt-cite" onClick={() => onOpen(id)}>
-        <span className="tt-badge">
-          📜 {tr(lang, 'toanthu')} · {volName(c.vol, lang)} · {lang === 'vi' ? 'năm' : 'year'} {canChi(year)}
-        </span>
-        <span className="tt-quote" lang="zh-Hant">「{c.quote}」</span>
-        {c.note && <span className="tt-sub">{pick(lang, c.note)}</span>}
-        <span className="tt-more">{lang === 'vi' ? 'Đọc đoạn nguyên văn →' : 'Read the passage →'}</span>
-      </button>
-    )
-  const why = TT_ABSENT[id]
+  const d = DN[id]
+  const more = lang === 'vi' ? 'Đọc đoạn nguyên văn →' : 'Read the passage →'
+  const yr = `${lang === 'vi' ? 'năm' : 'year'} ${canChi(year)}`
   return (
-    <div className="tt-cite absent">
-      <span className="tt-badge">{year > TT_END ? tr(lang, 'afterTT') : tr(lang, 'notInTT')}</span>
-      {why && year <= TT_END && <span className="tt-sub">{pick(lang, why)}</span>}
-    </div>
+    <>
+      {c ? (
+        <button className="tt-cite" onClick={() => onOpen(id, 'tt')}>
+          <span className="tt-badge">📜 {tr(lang, 'toanthu')} · {volName(c.vol, lang)} · {yr}</span>
+          <span className="tt-quote" lang="zh-Hant">「{c.quote}」</span>
+          {c.note && <span className="tt-sub">{pick(lang, c.note)}</span>}
+          <span className="tt-more">{more}</span>
+        </button>
+      ) : (
+        !d && (
+          <div className="tt-cite absent">
+            <span className="tt-badge">
+              {year > DN_END
+                ? lang === 'vi'
+                  ? 'Sau thời sử triều Nguyễn — theo tư liệu hiện đại'
+                  : 'After the Nguyễn chronicles — modern sources'
+                : year > TT_END
+                  ? tr(lang, 'afterTT')
+                  : tr(lang, 'notInTT')}
+            </span>
+            {TT_ABSENT[id] && year <= TT_END && <span className="tt-sub">{pick(lang, TT_ABSENT[id])}</span>}
+          </div>
+        )
+      )}
+      {d && (
+        <button className="tt-cite dn" onClick={() => onOpen(id, 'dn')}>
+          <span className="tt-badge">📘 Đại Nam thực lục · {dnName(d, lang)} · {yr}</span>
+          <span className="tt-quote" lang="zh-Hant">「{d.quote}」</span>
+          {d.note && <span className="tt-sub">{pick(lang, d.note)}</span>}
+          {!c && TT_ABSENT[id] && year <= TT_END && <span className="tt-sub">{lang === 'vi' ? 'Toàn thư: ' : 'Toàn thư: '}{pick(lang, TT_ABSENT[id])}</span>}
+          <span className="tt-more">{more}</span>
+        </button>
+      )}
+    </>
   )
 }
 
@@ -212,6 +243,8 @@ export function TracePanel({
     return out.reverse()
   }, [result, lang])
 
+  const names = result.id ? adminNames(result.id) : []
+  const curName = adminAt(names, year)
   const region = result.id ? provinceRegion(result.id) : undefined
   const annex = region ? ANNEX_INFO[region] : undefined
 
@@ -231,6 +264,27 @@ export function TracePanel({
         <div className="mx-4 mb-2 rounded-lg bg-[#2e7d6b]/10 px-3 py-2 text-[12.5px] leading-snug text-[#1f5a4c]">
           ⚑ {tr(lang, 'gainedBy')}: {annex[lang]}
         </div>
+      )}
+      {names.length > 0 && (
+        <details className="mx-4 mb-2 rounded-lg border border-ink/10 bg-white/40 px-3 py-2" open>
+          <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[.14em] text-ink/60">
+            {lang === 'vi' ? 'Tên gọi qua các thời' : 'Names through time'}
+            {curName && <span className="ml-1 normal-case tracking-normal text-[#86301f]">· {curName.name}</span>}
+          </summary>
+          <ol className="admin-list">
+            {names.map((n) => (
+              <li key={n.from + n.name}>
+                <button className={curName === n ? 'on' : n.from > year ? 'future' : ''} onClick={() => onYear(n.from)}>
+                  <span className="an-year">{fmtYear(n.from, lang, true)}</span>
+                  <span className="min-w-0">
+                    <b>{n.name}</b>
+                    <small>{pick(lang, n.unit)}</small>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ol>
+        </details>
       )}
       {rows.length === 0 ? (
         <p className="px-4 pb-4 text-[13px] text-ink/70">{tr(lang, 'traceHint')}</p>

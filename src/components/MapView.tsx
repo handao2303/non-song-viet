@@ -12,6 +12,8 @@ import { capitalsAt } from '../data/capitals'
 import { CAT_META, eventsNear } from '../data/events'
 import type { HistEvent, Lang } from '../data/types'
 import { pick } from '../lib/i18n'
+import type { Arrow, LngLat, MarkIcon, Story } from '../data/stories'
+import { ISLANDS, ARCHIPELAGOS } from '../data/islands'
 
 export interface Layers {
   territories: boolean
@@ -20,6 +22,7 @@ export interface Layers {
   rivers: boolean
   relief: boolean
   modern: boolean
+  islands: boolean
 }
 
 export interface FlyTarget {
@@ -37,6 +40,11 @@ interface Props {
   fly: FlyTarget | null
   activeEvent: string | null
   focusPolity: string | null
+  story?: { s: Story; step: number } | null
+  /** bản đồ phụ khi so sánh hai năm */
+  compare?: boolean
+  syncGroup?: Set<MLMap>
+  onIslands?: () => void
   onTrace: (p: [number, number]) => void
   onEvent: (e: HistEvent) => void
 }
@@ -76,6 +84,9 @@ const style: StyleSpecification = {
     gained: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     provinces: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     rivers: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+    'story-lines': { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+    'story-heads': { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+    islands: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
     line17: {
       type: 'geojson',
       data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[106.56, 16.98], [106.75, 17.0], [106.92, 17.02], [107.11, 17.0]] } },
@@ -124,6 +135,12 @@ const style: StyleSpecification = {
     { id: 'gained-line', type: 'line', source: 'gained', paint: { 'line-color': '#1d7a52', 'line-width': 1.6, 'line-dasharray': [2, 1] } },
     { id: 'borders-halo', type: 'line', source: 'borders', paint: { 'line-color': '#fff8e8', 'line-width': 4, 'line-opacity': 0.6, 'line-blur': 1 } },
     { id: 'borders', type: 'line', source: 'borders', paint: { 'line-color': '#5a2a1a', 'line-width': 1.4, 'line-opacity': 0.85 } },
+    { id: 'islands-box', type: 'line', source: 'islands', filter: ['==', ['get', 'k'], 'box'], paint: { 'line-color': '#86301f', 'line-width': 1.2, 'line-opacity': 0.55, 'line-dasharray': [3, 2] } },
+    { id: 'islands-dot', type: 'circle', source: 'islands', filter: ['==', ['get', 'k'], 'isl'], paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 4, 1.6, 8, 4], 'circle-color': '#e9dcc0', 'circle-stroke-color': '#86301f', 'circle-stroke-width': 1 } },
+    { id: 'story-casing', type: 'line', source: 'story-lines', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#fffaf0', 'line-width': ['case', ['get', 'cur'], 8, 5], 'line-opacity': ['case', ['get', 'cur'], 0.85, 0.4] } },
+    { id: 'story-line', type: 'line', source: 'story-lines', filter: ['!', ['get', 'dash']], layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': ['get', 'color'], 'line-width': ['case', ['get', 'cur'], 4.2, 2.6], 'line-opacity': ['case', ['get', 'cur'], 0.95, 0.42] } },
+    { id: 'story-dash', type: 'line', source: 'story-lines', filter: ['get', 'dash'], paint: { 'line-color': ['get', 'color'], 'line-width': ['case', ['get', 'cur'], 3.6, 2.4], 'line-opacity': ['case', ['get', 'cur'], 0.95, 0.42], 'line-dasharray': [1.6, 1.1] } },
+    { id: 'story-head', type: 'fill', source: 'story-heads', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': ['case', ['get', 'cur'], 0.95, 0.42] } },
     { id: 'line17', type: 'line', source: 'line17', layout: { visibility: 'none' }, paint: { 'line-color': '#7a1010', 'line-width': 2.2, 'line-dasharray': [2, 1.2] } },
   ],
 }
@@ -138,9 +155,60 @@ function safely(fn: () => void, tries = 40) {
   }
 }
 
+const SIDE_COLOR = { vn: '#c0392b', foe: '#26364f', life: '#a8741a' }
+const MARK_ICON: Record<MarkIcon, string> = { win: '⚑', fall: '✕', camp: '▲', stake: '⫶', city: '●', star: '★' }
+let syncing = false
+
+/** Cắt đường theo tỉ lệ độ dài (0–1), tính trên mặt phẳng gần đúng */
+function slicePath(path: LngLat[], f: number): LngLat[] {
+  if (f >= 1) return path
+  const k = Math.cos((path[0][1] * Math.PI) / 180)
+  const seg: number[] = []
+  let total = 0
+  for (let i = 1; i < path.length; i++) {
+    const d = Math.hypot((path[i][0] - path[i - 1][0]) * k, path[i][1] - path[i - 1][1])
+    seg.push(d)
+    total += d
+  }
+  let want = total * f
+  const out: LngLat[] = [path[0]]
+  for (let i = 1; i < path.length; i++) {
+    if (want >= seg[i - 1]) {
+      out.push(path[i])
+      want -= seg[i - 1]
+    } else {
+      const r = seg[i - 1] ? want / seg[i - 1] : 0
+      out.push([path[i - 1][0] + (path[i][0] - path[i - 1][0]) * r, path[i - 1][1] + (path[i][1] - path[i - 1][1]) * r])
+      break
+    }
+  }
+  return out
+}
+
+/** Đầu mũi tên tam giác, dựng theo pixel màn hình để luôn cân đối */
+function arrowHead(map: MLMap, path: LngLat[], px: number): LngLat[] | null {
+  if (path.length < 2) return null
+  const tip = map.project(path[path.length - 1])
+  let prev = map.project(path[path.length - 2])
+  for (let i = path.length - 2; i >= 0 && Math.hypot(tip.x - prev.x, tip.y - prev.y) < 2; i--) prev = map.project(path[i])
+  const len = Math.hypot(tip.x - prev.x, tip.y - prev.y)
+  if (len < 1) return null
+  const dx = (tip.x - prev.x) / len
+  const dy = (tip.y - prev.y) / len
+  const bx = tip.x - dx * px * 0.55
+  const by = tip.y - dy * px * 0.55
+  const pts: [number, number][] = [
+    [tip.x + dx * px * 0.45, tip.y + dy * px * 0.45],
+    [bx - dy * px * 0.5, by + dx * px * 0.5],
+    [bx + dy * px * 0.5, by - dx * px * 0.5],
+  ]
+  const ring = pts.map((p) => map.unproject(p)).map((l) => [l.lng, l.lat] as LngLat)
+  return [...ring, ring[0]]
+}
+
 type MarkerItem = { id: string; coord: [number, number]; node: React.ReactNode; z?: number }
 
-export default function MapView({ geo, year, lang, layers, trace, fly, activeEvent, focusPolity, onTrace, onEvent }: Props) {
+export default function MapView({ geo, year, lang, layers, trace, fly, activeEvent, focusPolity, story, compare, syncGroup, onIslands, onTrace, onEvent }: Props) {
   const box = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MLMap | null>(null)
   const [readyMap, setReadyMap] = useState<MLMap | null>(null)
@@ -161,7 +229,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       center: narrow ? [106.4, 15.8] : [106.6, 15.9],
       zoom: narrow ? 4.2 : 4.9,
       minZoom: 3.5,
-      maxZoom: 11,
+      maxZoom: 13,
       maxBounds: [[88, -2], [128, 33]],
       attributionControl: false,
       dragRotate: false,
@@ -179,9 +247,24 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       ;(map.getSource('provinces') as GeoJSONSource).setData(geo.provinces)
       ;(map.getSource('neighbors') as GeoJSONSource).setData(geo.neighbors)
       ;(map.getSource('rivers') as GeoJSONSource).setData(geo.rivers)
+      ;(map.getSource('islands') as GeoJSONSource).setData({
+        type: 'FeatureCollection',
+        features: [
+          ...ARCHIPELAGOS.map((a) => ({ type: 'Feature' as const, properties: { k: 'box' }, geometry: { type: 'LineString' as const, coordinates: a.box } })),
+          ...ISLANDS.map((i) => ({ type: 'Feature' as const, properties: { k: 'isl', id: i.id }, geometry: { type: 'Point' as const, coordinates: i.coord } })),
+        ],
+      })
       setReadyMap(map)
     })
     map.on('zoom', () => setZoom(map.getZoom()))
+    // Đồng bộ camera giữa hai bản đồ khi so sánh
+    syncGroup?.add(map)
+    map.on('move', () => {
+      if (syncing || !syncGroup) return
+      syncing = true
+      for (const o of syncGroup) if (o !== map) o.jumpTo({ center: map.getCenter(), zoom: map.getZoom() })
+      syncing = false
+    })
     map.on('click', (e: MapMouseEvent) => onTraceRef.current([e.lngLat.lng, e.lngLat.lat]))
     map.getCanvas().style.cursor = 'crosshair'
     mapRef.current = map
@@ -192,7 +275,12 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       })
       map.once('idle', () => (document.body.dataset.idleAt = String(Math.round(performance.now()))))
     }
+    if (syncGroup) {
+      const other = [...syncGroup].find((o) => o !== map)
+      if (other) map.jumpTo({ center: other.getCenter(), zoom: other.getZoom() })
+    }
     return () => {
+      syncGroup?.delete(map)
       setReadyMap(null)
       for (const m of markers.current.values()) m.remove()
       setSlots({})
@@ -200,6 +288,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       mapRef.current = null
       markers.current.clear()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo])
 
   const terr = useMemo(() => territoryAt(geo, year), [geo, year])
@@ -237,10 +326,12 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     vis('borders', layers.territories)
     vis('borders-halo', layers.territories)
     vis('neighbors-tint', layers.territories)
-    for (const id of ['gained-fill', 'gained-glow', 'gained-line']) vis(id, layers.territories)
+    for (const id of ['gained-fill', 'gained-glow', 'gained-line']) vis(id, layers.territories && !compare)
     vis('rivers', layers.rivers)
     vis('hillshade', layers.relief)
     vis('provinces-line', layers.modern)
+    vis('islands-box', layers.islands)
+    vis('islands-dot', layers.islands)
     })
   }, [layers, ready])
 
@@ -254,10 +345,72 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     })
   }, [focusPolity, ready])
 
+  // Diễn biến trận đánh / hành trình: vẽ mũi tên chạy dần
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !ready) return
+    const lines = map.getSource('story-lines') as GeoJSONSource | undefined
+    const heads = map.getSource('story-heads') as GeoJSONSource | undefined
+    if (!lines || !heads) return
+    if (!story) {
+      safely(() => {
+        lines.setData({ type: 'FeatureCollection', features: [] })
+        heads.setData({ type: 'FeatureCollection', features: [] })
+      })
+      return
+    }
+    const { s, step } = story
+    const past = s.steps.slice(0, step).flatMap((x) => x.arrows ?? [])
+    const cur = s.steps[step]?.arrows ?? []
+    const color = (a: Arrow) => (s.kind === 'life' ? SIDE_COLOR.life : SIDE_COLOR[a.side])
+    let f = 0
+    const draw = () => {
+      const L: GeoJSON.Feature[] = []
+      const H: GeoJSON.Feature[] = []
+      const add = (a: Arrow, isCur: boolean, frac: number) => {
+        const p = slicePath(a.path, frac)
+        if (p.length < 2) return
+        const props = { color: color(a), cur: isCur, dash: !!(a.retreat || a.line) }
+        L.push({ type: 'Feature', properties: props, geometry: { type: 'LineString', coordinates: p } })
+        if (!a.line) {
+          const h = arrowHead(map, p, isCur ? 17 : 12)
+          if (h) H.push({ type: 'Feature', properties: props, geometry: { type: 'Polygon', coordinates: [h] } })
+        }
+      }
+      for (const a of past) add(a, false, 1)
+      for (const a of cur) add(a, true, f)
+      lines.setData({ type: 'FeatureCollection', features: L })
+      heads.setData({ type: 'FeatureCollection', features: H })
+    }
+    let raf = 0
+    const t0 = performance.now() + 500 // chờ camera bay tới
+    const tick = (now: number) => {
+      f = Math.max(0, Math.min(1, (now - t0) / 1700))
+      f = 1 - Math.pow(1 - f, 2.2)
+      safely(draw, 0)
+      if (now - t0 < 1700) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    const onZoom = () => !raf || f >= 1 ? safely(draw, 0) : undefined
+    map.on('zoom', onZoom)
+    return () => {
+      cancelAnimationFrame(raf)
+      map.off('zoom', onZoom)
+    }
+  }, [story, ready])
+
+  // Chừa chỗ cho bảng câu chuyện bên phải
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !ready || compare) return
+    const wide = window.innerWidth >= 900
+    map.setPadding({ left: wide ? 380 : 0, top: 60, bottom: wide ? 150 : 140, right: story && wide ? 400 : 0 })
+  }, [story, ready, compare])
+
   // Bay tới vị trí
   useEffect(() => {
-    if (fly && mapRef.current) mapRef.current.flyTo({ center: fly.center, zoom: fly.zoom ?? Math.max(mapRef.current.getZoom(), 6.2), duration: 1400, essential: true })
-  }, [fly])
+    if (fly && mapRef.current && ready) mapRef.current.flyTo({ center: fly.center, zoom: fly.zoom ?? Math.max(mapRef.current.getZoom(), 6.2), duration: 1400, essential: true })
+  }, [fly, ready])
 
   // ——— Nhãn & điểm HTML ———
   const items: MarkerItem[] = []
@@ -297,6 +450,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
     }
   }
   for (const l of STATIC_LABELS) {
+    if (l.cls === 'island' && layers.islands) continue
     if (l.cls === 'river' && !layers.rivers) continue
     if (l.cls === 'mountain' && zoom < 5.4) continue
     items.push({ id: `st-${l.id}`, coord: l.coord, z: 0, node: <div className={`static-label ${l.cls}`}>{l[lang]}</div> })
@@ -318,7 +472,51 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
       })
     }
   }
-  if (layers.events) {
+  if (story) {
+    const { s: st, step } = story
+    st.steps.slice(0, step + 1).forEach((x, si) =>
+      (x.marks ?? []).forEach((m, mi) => {
+        const isCur = si === step
+        if (!isCur && st.kind === 'battle' && m.icon !== 'win' && m.icon !== 'fall' && m.icon !== 'star') return
+        items.push({
+          id: `sm-${si}-${mi}`,
+          coord: m.coord,
+          z: isCur ? 7 : 5,
+          node: (
+            <div className={`story-mark ${m.icon} ${isCur ? 'cur' : 'past'} ${st.kind}`}>
+              <span className="sm-ic">{MARK_ICON[m.icon]}</span>
+              {(isCur || zoom > 8) && <span className="sm-label">{pick(lang, m.label)}</span>}
+            </div>
+          ),
+        })
+      }),
+    )
+  }
+  if (layers.islands && !compare) {
+    for (const a of ARCHIPELAGOS) {
+      items.push({
+        id: `arch-${a.id}`,
+        coord: a.label,
+        z: 2,
+        node: (
+          <button
+            className="arch-label"
+            onClick={(ev) => {
+              ev.stopPropagation()
+              onIslands?.()
+            }}
+          >
+            <b>{pick(lang, a.name)}</b>
+            <span>{pick(lang, a.admin)}</span>
+          </button>
+        ),
+      })
+    }
+    if (zoom >= 7.2)
+      for (const i of ISLANDS)
+        items.push({ id: `isl-${i.id}`, coord: i.coord, z: 1, node: <div className="isl-label">{pick(lang, i.name)}</div> })
+  }
+  if (layers.events && !story) {
     for (const e of eventsNear(year)) {
       const m = CAT_META[e.cat]
       const fresh = year - e.year <= 2 || (e.endYear && year <= e.endYear)
@@ -382,7 +580,7 @@ export default function MapView({ geo, year, lang, layers, trace, fly, activeEve
   }, [sig, ready])
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 isolate">
       <div ref={box} className="h-full w-full" />
       {items.map((it) => (slots[it.id] ? createPortal(it.node, slots[it.id], it.id) : null))}
     </div>
