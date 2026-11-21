@@ -10,7 +10,7 @@ Bản đồ tương tác lãnh thổ, triều đại, kinh đô và sự kiện 
 - **Biểu đồ diện tích** lãnh thổ người Việt cai quản theo thời gian
 - **~95 sự kiện** có toạ độ, **~30 kinh đô / trị sở**, tìm kiếm không dấu (⌘K)
 - **Hành trình Nam tiến**: tour tự động 1069 → 1802
-- **Diễn biến trận đánh**: mũi tên tiến quân chạy trên bản đồ theo từng mốc — Bạch Đằng 938, Như Nguyệt 1076, Bạch Đằng 1288, Chi Lăng – Xương Giang 1427, Ngọc Hồi – Đống Đa 1789, Điện Biên Phủ 1954
+- **Diễn biến 12 trận đánh**: mũi tên tiến quân chạy trên bản đồ theo từng mốc — Bạch Đằng 938, Lê Hoàn phá Tống 981, Như Nguyệt 1076, Đông Bộ Đầu 1258, Chương Dương – Hàm Tử 1285, Bạch Đằng 1288, Chi Lăng – Xương Giang 1427, Rạch Gầm – Xoài Mút 1785, Ngọc Hồi – Đống Đa 1789, Biên giới 1950, Điện Biên Phủ 1954, Đại thắng mùa Xuân 1975
 - **Hành trình nhân vật**: 18 nhân vật có chân dung minh hoạ (Hai Bà Trưng, Lý Nam Đế, Ngô Quyền, Đinh Bộ Lĩnh, Lê Hoàn, Trần Hưng Đạo, Lê Thánh Tông, Nguyễn Hoàng, Quang Trung, Phan Bội Châu, Hồ Chí Minh…)
 - **Đọc nguyên văn có phiên âm Hán Việt**: rê chuột / chạm vào từng chữ để xem âm và nghĩa, bật "âm trên chữ", dòng phiên âm đầy đủ
 - **Hoàng Sa – Trường Sa**: lớp quần đảo và các mốc sử liệu chủ quyền (1686 → 2025)
